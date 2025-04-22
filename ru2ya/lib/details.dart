@@ -132,7 +132,6 @@ class _DetailsState extends State<Details> {
                   context,
                   MaterialPageRoute(builder: (context) => Info()),
                 );
-
               },
             ),
           ),
@@ -201,15 +200,18 @@ class _DetailsState extends State<Details> {
                                 Text(
                                   "CONNECTED",
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,),
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 SizedBox(height: 2),
                                 Text(
                                   "8hr Remaining",
                                   style: TextStyle(
-                                      color: Colors.white, fontSize: 14,),
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ],
                             ),
