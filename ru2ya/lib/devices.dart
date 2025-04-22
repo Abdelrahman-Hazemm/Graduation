@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ru2ya/caregiver.dart';
 import 'package:ru2ya/details.dart';
+import 'package:ru2ya/welcome.dart';
 
 class Devices extends StatelessWidget {
   final List<Map<String, String>> devices = [
@@ -14,6 +15,24 @@ class Devices extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const Welcome(),
+              ),
+            );
+          },
+          icon: Image.asset(
+            'assets/arrow-left.png',
+            width: 35,
+            height: 35,
+            color: Colors.black,
+          ),
+        ),
+      ),
       backgroundColor: Colors.white,
       body: ListView(
         children: [
@@ -22,7 +41,7 @@ class Devices extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 40.0),
+                const SizedBox(height: 0.0),
                 const Text(
                   "PAIRED DEVICES",
                   style: TextStyle(
@@ -38,7 +57,7 @@ class Devices extends StatelessWidget {
                       InkWell(
                         onTap: () {
                           Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) => Details()));
+                              .push(MaterialPageRoute(builder: (context) => const Details()));
 
                         },
                         child: ListTile(
@@ -96,7 +115,7 @@ class Devices extends StatelessWidget {
                 ));
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 5.0),
+                padding: const EdgeInsets.symmetric(horizontal: 27.0, vertical: 5.0),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0075f9),
                   borderRadius: BorderRadius.circular(20.0),
@@ -115,7 +134,7 @@ class Devices extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
+                        fontSize: 18.0,
                       ),
                     ),
                   ],

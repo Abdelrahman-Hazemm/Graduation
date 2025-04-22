@@ -50,8 +50,7 @@ class _DetailsState extends State<Details> {
     if (permission == LocationPermission.deniedForever) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("Location permissions permanently denied")),
+          const SnackBar(content: Text("Location permissions permanently denied")),
         );
       }
       _isLoadingLocation = false;
@@ -138,198 +137,194 @@ class _DetailsState extends State<Details> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
-                  child: Stack(
-                    children: [
-                      GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: _currentPosition,
-                          zoom: 15,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 300,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20.0),
+                    child: Stack(
+                      children: [
+                        GoogleMap(
+                          initialCameraPosition: CameraPosition(
+                            target: _currentPosition,
+                            zoom: 15,
+                          ),
+                          onMapCreated: (GoogleMapController controller) {
+                            _mapController = controller;
+                          },
+                          myLocationEnabled: true,
+                          markers: _markers,
+                          zoomControlsEnabled: false,
                         ),
-                        onMapCreated: (GoogleMapController controller) {
-                          _mapController = controller;
-                        },
-                        myLocationEnabled: true,
-                        markers: _markers,
-                        zoomControlsEnabled: false,
-                      ),
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: IconButton(
-                            icon: const Icon(Icons.my_location,
-                                color: Colors.blue),
-                            onPressed: _getUserLocation,
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: IconButton(
+                              icon: const Icon(Icons.my_location, color: Colors.blue),
+                              onPressed: _getUserLocation,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 3,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
+                const SizedBox(height: 25),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4ACD12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "CONNECTED",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              "8hr Remaining",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          "80%",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 25),
+                InkWell(
+                  onTap: () {},
+                  child: Material(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: const Color(0xFF4ACD12),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "CONNECTED",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  "8hr Remaining",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/object.png",
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(width: 40.0),
+                          const Text(
+                            "OBJECT\nDETECTION MODE",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                            Text(
-                              "80%",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 25,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 25),
-                    InkWell(
-                      onTap: () {},
-                      child: Material(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF4ACD12),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "assets/object.png",
-                                width: 50,
-                                height: 50,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 40.0),
-                              const Text(
-                                "OBJECT\nDETECTION MODE",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    InkWell(
-                      onTap: () {},
-                      child: Material(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF0075f9),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "assets/glasses.png",
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 40.0),
-                              const Text(
-                                "My Glasses",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    InkWell(
-                      onTap: () {},
-                      child: Material(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF0075f9),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "assets/visible.png",
-                                width: 55,
-                                height: 55,
-                                fit: BoxFit.contain,
-                              ),
-                              const SizedBox(width: 57.0),
-                              const Text(
-                                "Live Feed",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 25),
+                InkWell(
+                  onTap: () {},
+                  child: Material(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0075f9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/glasses.png",
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(width: 40.0),
+                          const Text(
+                            "My Glasses",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 25),
+                InkWell(
+                  onTap: () {},
+                  child: Material(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0075f9),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/visible.png",
+                            width: 55,
+                            height: 55,
+                            fit: BoxFit.contain,
+                          ),
+                          const SizedBox(width: 57.0),
+                          const Text(
+                            "Live Feed",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 25),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

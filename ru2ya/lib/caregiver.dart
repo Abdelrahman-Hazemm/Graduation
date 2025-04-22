@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ru2ya/devices.dart';
 
 class Caregiver extends StatelessWidget {
   const Caregiver({super.key});
@@ -6,65 +7,87 @@ class Caregiver extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => Devices(),
+              ),
+            );
+          },
+          icon: Image.asset(
+            'assets/arrow-left.png',
+            width: 35,
+            height: 35,
+            color: Colors.black,
+          ),
+        ),
+      ),
+
       backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 150.0),
-            const Text(
-              'Scan Your QR Code',
-              style: TextStyle(
-                fontSize: 35.0,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0075f9),
-              ),
-            ),
-            const SizedBox(height: 50.0),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.asset('assets/QR.png', width: 270),
-                Positioned(
-                  top: 60,
-                  child: Image.asset('assets/Group.png', height: 210),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: [
+              const SizedBox(height: 0.0),
+              const Text(
+                'Scan Your QR Code',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0075f9),
                 ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            const Text(
-              'OR',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-                color: Color(0xFF0075f9),
               ),
-            ),
-            const Text(
-              'Add New Glasses ID',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 27,
-                color: Color(0xFF0075f9),
+              const SizedBox(height: 40.0),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Image.asset('assets/QR.png', width: 270),
+                  Positioned(
+                    top: 60,
+                    child: Image.asset('assets/Group.png', height: 210),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 20.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: TextField(
+              const SizedBox(height: 40.0),
+              const Text(
+                'OR',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                  color: Color(0xFF0075f9),
+                ),
+              ),
+              const SizedBox(height: 10.0),
+              const Text(
+                'Add New Glasses ID',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25,
+                  color: Color(0xFF0075f9),
+                ),
+              ),
+              const SizedBox(height: 30.0),
+              TextField(
                 decoration: InputDecoration(
                   prefixIcon: Container(
                     padding: const EdgeInsets.all(10.0),
                     child: Image.asset(
                       'assets/glasses.png',
                       height: 24.0,
-                      color: Colors.black,
                       width: 24.0,
+                      color: Colors.black,
                     ),
                   ),
                   labelText: 'Glasses ID',
                   labelStyle: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 20.0,
+                    fontSize: 18.0,
                     color: Color(0xFFA6A6A6),
                   ),
                   filled: true,
@@ -75,33 +98,35 @@ class Caregiver extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            InkWell(
-              onTap: () {
-                // Navigator.of(context).push(MaterialPageRoute(
-                //   builder: (context) =>const Welcome(),),);
-              },
-              borderRadius: BorderRadius.circular(15.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0075f9),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                alignment: Alignment.center,
-                width: 250,
-                child: const Text(
-                  'ADD',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25.0,
+              const SizedBox(height: 30.0),
+              InkWell(
+                onTap: () {
+                  // Navigator.of(context).push(MaterialPageRoute(
+                  //   builder: (context) => const Welcome(),
+                  // ));
+                },
+                borderRadius: BorderRadius.circular(15.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  width: 220,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0075f9),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'ADD',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24.0,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 40.0),
+            ],
+          ),
         ),
       ),
     );
