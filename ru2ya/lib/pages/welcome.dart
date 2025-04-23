@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ru2ya/pages/devices.dart';
+import 'package:ru2ya/pages/impaired.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});
@@ -80,8 +81,11 @@ class Welcome extends StatelessWidget {
           const SizedBox(height: 40.0),
           InkWell(
             onTap: () {
-              // Navigator.of(context).push(MaterialPageRoute(
-              //   builder: (context) =>const Welcome(),),);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const ImpairedPage(),
+                ),
+              );
             },
             child: Container(
               padding:

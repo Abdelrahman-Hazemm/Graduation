@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "628903137861",
+    "project_id": "grad-7c2ae",
+    "storage_bucket": "grad-7c2ae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:628903137861:android:927cb3dc38fa629f67092c",
+        "android_client_info": {
+          "package_name": "com.example.ru2ya"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoJWuGiqzwl0TdTGtu5ejHhvcOJ1gQ8Kg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
