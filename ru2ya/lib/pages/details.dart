@@ -99,22 +99,19 @@ class _DetailsState extends State<Details> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: GestureDetector(
-          onTap: () {
+        leading: IconButton(
+          onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => Devices(),
+                builder: (context) =>Devices(),
               ),
             );
           },
-          child: Container(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: Image.asset(
-              'assets/arrow-left.png',
-              width: 13.0,
-              height: 13.0,
-              color: Colors.black38,
-            ),
+          icon: Image.asset(
+            'assets/arrow-left.png',
+            width: 35,
+            height: 35,
+            color: Colors.black,
           ),
         ),
         actions: [
