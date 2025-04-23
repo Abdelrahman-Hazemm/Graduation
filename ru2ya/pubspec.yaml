@@ -35,6 +35,10 @@ dependencies:
   flutter_riverpod: ^2.5.1
   url_launcher: ^6.0.3
   android_intent_plus: ^5.3.0
+  bloc: ^9.0.0
+  flutter_bloc: ^9.1.0
+  permission_handler: ^11.1.0
+
 
 
 

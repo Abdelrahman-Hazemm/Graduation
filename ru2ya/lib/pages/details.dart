@@ -20,7 +20,7 @@ class _DetailsState extends State<Details> {
   Set<Marker> _markers = {};
   bool _isLoadingLocation = false;
   StreamSubscription<DocumentSnapshot>? _locationSubscription;
-  final String blindUserId = "blind_user_1"; // The ID to track
+  final String blindUserId = "blind_user_1";
 
   @override
   void initState() {
@@ -34,7 +34,6 @@ class _DetailsState extends State<Details> {
     super.dispose();
   }
 
-  // Listen to location updates from Firestore
   void _listenToBlindUserLocation() {
     _locationSubscription = FirebaseFirestore.instance
         .collection('blind_users')
@@ -53,7 +52,6 @@ class _DetailsState extends State<Details> {
               _updateMarkers();
             });
 
-            // Move camera to new position
             if (_mapController != null) {
               _mapController!
                   .animateCamera(CameraUpdate.newLatLng(_currentPosition));
@@ -66,7 +64,38 @@ class _DetailsState extends State<Details> {
     });
   }
 
-  // Update map markers based on current position
+  Future<void> _fetchLatestLocation() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('blind_users')
+          .doc(blindUserId)
+          .get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        if (data.containsKey('location')) {
+          GeoPoint geoPoint = data['location'] as GeoPoint;
+          setState(() {
+            _currentPosition = LatLng(geoPoint.latitude, geoPoint.longitude);
+            _updateMarkers();
+          });
+
+          if (_mapController != null) {
+            _mapController!
+                .animateCamera(CameraUpdate.newLatLng(_currentPosition));
+          }
+        }
+      }
+    } catch (e) {
+      print("Failed to fetch location manually: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error fetching location: $e")),
+        );
+      }
+    }
+  }
+
   void _updateMarkers() {
     _markers.clear();
     _markers.add(
@@ -79,7 +108,6 @@ class _DetailsState extends State<Details> {
     );
   }
 
-  @override
   Future<void> _getUserLocation() async {
     if (_isLoadingLocation) return;
     _isLoadingLocation = true;
@@ -127,7 +155,6 @@ class _DetailsState extends State<Details> {
 
       if (mounted) {
         setState(() {
-          // Add your own location as a blue marker
           _markers.add(
             Marker(
               markerId: const MarkerId("caregiver_location"),
@@ -141,7 +168,6 @@ class _DetailsState extends State<Details> {
       }
 
       if (_mapController != null && mounted) {
-        // Adjust camera to show both your location and blind user's location
         _mapController!.animateCamera(CameraUpdate.newLatLngZoom(
             LatLng(position.latitude, position.longitude), 15.0));
       }
@@ -165,9 +191,7 @@ class _DetailsState extends State<Details> {
         leading: IconButton(
           onPressed: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => Devices(),
-              ),
+              MaterialPageRoute(builder: (context) => Devices()),
             );
           },
           icon: Image.asset(
@@ -182,11 +206,7 @@ class _DetailsState extends State<Details> {
             width: 60,
             height: 60,
             child: IconButton(
-              icon: const Icon(
-                Icons.info,
-                color: Colors.blue,
-                size: 35,
-              ),
+              icon: const Icon(Icons.info, color: Colors.blue, size: 35),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -216,7 +236,7 @@ class _DetailsState extends State<Details> {
                           ),
                           onMapCreated: (GoogleMapController controller) {
                             _mapController = controller;
-                            _updateMarkers(); // Set initial markers when map is created
+                            _updateMarkers();
                           },
                           myLocationEnabled: true,
                           markers: _markers,
@@ -225,16 +245,28 @@ class _DetailsState extends State<Details> {
                         Positioned(
                           top: 10,
                           right: 10,
-                          child: CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: IconButton(
-                              icon: const Icon(Icons.my_location,
-                                  color: Colors.blue),
-                              onPressed: _getUserLocation,
-                            ),
+                          child: Column(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: IconButton(
+                                  icon: const Icon(Icons.refresh,
+                                      color: Colors.green),
+                                  onPressed: _fetchLatestLocation,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              CircleAvatar(
+                                backgroundColor: Colors.white,
+                                child: IconButton(
+                                  icon: const Icon(Icons.my_location,
+                                      color: Colors.blue),
+                                  onPressed: _getUserLocation,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        // Add a status indicator for the blind user
                         Positioned(
                           bottom: 10,
                           left: 10,
@@ -265,159 +297,107 @@ class _DetailsState extends State<Details> {
                   ),
                 ),
                 const SizedBox(height: 25),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF4ACD12),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "CONNECTED",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 2),
-                            Text(
-                              "8hr Remaining",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          "80%",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                _buildStatusCard(),
                 const SizedBox(height: 25),
-                InkWell(
-                  onTap: () {},
-                  child: Material(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4ACD12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/object.png",
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(width: 40.0),
-                          const Text(
-                            "OBJECT\nDETECTION MODE",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                _buildActionTile("OBJECT\nDETECTION MODE", "assets/object.png",
+                    const Color(0xFF4ACD12), () {}),
                 const SizedBox(height: 25),
-                InkWell(
-                  onTap: () {},
-                  child: Material(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0075f9),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/glasses.png",
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(width: 40.0),
-                          const Text(
-                            "My Glasses",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                _buildActionTile("My Glasses", "assets/glasses.png",
+                    const Color(0xFF0075f9), () {}),
                 const SizedBox(height: 25),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => VlcStreamPage()),
-                    );
-                  },
-                  child: Material(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0075f9),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            "assets/visible.png",
-                            width: 55,
-                            height: 55,
-                            fit: BoxFit.contain,
-                          ),
-                          const SizedBox(width: 57.0),
-                          const Text(
-                            "Live Feed",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                _buildActionTile("Live Feed", "assets/visible.png",
+                    const Color(0xFF0075f9), () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => VlcStreamPage()),
+                  );
+                }),
                 const SizedBox(height: 25),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusCard() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF4ACD12),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "CONNECTED",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  "8hr Remaining",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+            Text(
+              "80%",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionTile(String title, String asset, Color color, Function() onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Material(
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                asset,
+                width: 55,
+                height: 55,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: 40.0),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
       ),

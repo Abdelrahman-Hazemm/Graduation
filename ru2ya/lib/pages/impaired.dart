@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ImpairedPage extends StatefulWidget {
   const ImpairedPage({Key? key}) : super(key: key);
@@ -12,8 +12,8 @@ class ImpairedPage extends StatefulWidget {
 }
 
 class _ImpairedPageState extends State<ImpairedPage> {
-  final String blindUserId = "blind_user_1"; // Matches your Firebase structure
-  late StreamSubscription<Position> _positionStreamSubscription;
+  final String blindUserId = "blind_user_1";
+  StreamSubscription<Position>? _positionStreamSubscription;
   bool _isTracking = false;
   String _statusMessage = "Initializing location tracking...";
 
@@ -23,29 +23,27 @@ class _ImpairedPageState extends State<ImpairedPage> {
     _initLocationTracking();
   }
 
-  // Start tracking the location and sending updates to Firebase
   Future<void> _initLocationTracking() async {
-    bool permissionGranted = await _checkLocationPermission();
+    final permissionGranted = await _checkLocationPermission();
     if (permissionGranted) {
       _startLocationUpdates();
     }
   }
 
-  // Check and request permission if necessary
   Future<bool> _checkLocationPermission() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       setState(() {
-        _statusMessage =
-            "Location services are disabled. Please enable them in settings.";
+        _statusMessage = "Location services are disabled. Please enable them.";
       });
       return false;
     }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
+    var status = await Permission.location.status;
+
+    if (status.isDenied) {
+      status = await Permission.location.request();
+      if (status.isDenied) {
         setState(() {
           _statusMessage = "Location permission denied.";
         });
@@ -53,54 +51,58 @@ class _ImpairedPageState extends State<ImpairedPage> {
       }
     }
 
-    if (permission == LocationPermission.deniedForever) {
+    if (status.isPermanentlyDenied) {
       setState(() {
         _statusMessage =
-            "Location permissions are permanently denied. Please enable them in app settings.";
+            "Location permission permanently denied. Enable it in settings.";
       });
+      openAppSettings();
       return false;
     }
 
     return true;
   }
 
-  // Start listening to location updates
   void _startLocationUpdates() {
+    if (_positionStreamSubscription != null) return;
+
     setState(() {
       _isTracking = true;
       _statusMessage = "Tracking and sending your location...";
     });
 
+    const locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+    );
+
     _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10, // Update location every 10 meters
-      ),
-    ).listen((Position position) {
-      _sendLocationToFirebase(position);
-    });
+      locationSettings: locationSettings,
+    ).listen(
+      (Position position) => _sendLocationToFirebase(position),
+      onError: (error) {
+        print("Location stream error: $error");
+        setState(() {
+          _statusMessage = "Location stream error: $error";
+        });
+      },
+    );
   }
 
-  // Send the location data to Firebase using the structure from the images
   Future<void> _sendLocationToFirebase(Position position) async {
     try {
-      // Reference to the document
-      final DocumentReference docRef =
-          FirebaseFirestore.instance.collection('blind_users').doc(blindUserId);
+      final docRef = FirebaseFirestore.instance
+          .collection('blind_users')
+          .doc(blindUserId);
 
-      // Get the document
-      DocumentSnapshot docSnapshot = await docRef.get();
+      final docSnapshot = await docRef.get();
 
       if (docSnapshot.exists) {
-        // Update only location and timestamp if document exists
         await docRef.update({
           'location': GeoPoint(position.latitude, position.longitude),
           'lastUpdated': FieldValue.serverTimestamp(),
         });
-        print("Location updated for existing user");
       } else {
-        // Create new document if it doesn't exist
-        print("Creating new user document");
         await docRef.set({
           'name': 'Jane',
           'assignedCaregivers': ['caregiver_1'],
@@ -110,10 +112,10 @@ class _ImpairedPageState extends State<ImpairedPage> {
       }
 
       setState(() {
-        _statusMessage = "Location updated successfully";
+        _statusMessage = "Location updated successfully.";
       });
     } catch (e) {
-      print("Error sending location: $e");
+      print("Firebase update error: $e");
       setState(() {
         _statusMessage = "Error sending location: $e";
       });
@@ -122,10 +124,7 @@ class _ImpairedPageState extends State<ImpairedPage> {
 
   @override
   void dispose() {
-    // Cancel the subscription when the widget is disposed
-    if (_isTracking) {
-      _positionStreamSubscription.cancel();
-    }
+    _positionStreamSubscription?.cancel();
     super.dispose();
   }
 
