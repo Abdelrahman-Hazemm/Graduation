@@ -13,7 +13,7 @@ class ImpairedPage extends StatefulWidget {
 
 class _ImpairedPageState extends State<ImpairedPage> {
   final String blindUserId = "blind_user_1";
-  StreamSubscription<Position>? _positionStreamSubscription;
+  Timer? _locationTimer;
   bool _isTracking = false;
   String _statusMessage = "Initializing location tracking...";
 
@@ -64,36 +64,32 @@ class _ImpairedPageState extends State<ImpairedPage> {
   }
 
   void _startLocationUpdates() {
-    if (_positionStreamSubscription != null) return;
+    if (_locationTimer != null) return;
 
     setState(() {
       _isTracking = true;
-      _statusMessage = "Tracking and sending your location...";
+      _statusMessage = "Tracking and sending your location every 10 seconds...";
     });
 
-    const locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 10,
-    );
-
-    _positionStreamSubscription = Geolocator.getPositionStream(
-      locationSettings: locationSettings,
-    ).listen(
-      (Position position) => _sendLocationToFirebase(position),
-      onError: (error) {
-        print("Location stream error: $error");
+    _locationTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      try {
+        Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        );
+        await _sendLocationToFirebase(position);
+      } catch (e) {
+        print("Error getting location: $e");
         setState(() {
-          _statusMessage = "Location stream error: $error";
+          _statusMessage = "Error getting location: $e";
         });
-      },
-    );
+      }
+    });
   }
 
   Future<void> _sendLocationToFirebase(Position position) async {
     try {
-      final docRef = FirebaseFirestore.instance
-          .collection('blind_users')
-          .doc(blindUserId);
+      final docRef =
+          FirebaseFirestore.instance.collection('blind_users').doc(blindUserId);
 
       final docSnapshot = await docRef.get();
 
@@ -124,7 +120,7 @@ class _ImpairedPageState extends State<ImpairedPage> {
 
   @override
   void dispose() {
-    _positionStreamSubscription?.cancel();
+    _locationTimer?.cancel();
     super.dispose();
   }
 
