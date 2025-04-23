@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ru2ya/pages/devices.dart';
 import 'package:ru2ya/pages/info.dart';
+import 'package:ru2ya/pages/vlc_stream.dart';
 
 class Details extends StatefulWidget {
   const Details({super.key});
@@ -103,7 +104,7 @@ class _DetailsState extends State<Details> {
           onPressed: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) =>Devices(),
+                builder: (context) => Devices(),
               ),
             );
           },
@@ -288,7 +289,12 @@ class _DetailsState extends State<Details> {
                 ),
                 const SizedBox(height: 25),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => VlcStreamPage()),
+                    );
+                  },
                   child: Material(
                     borderRadius: BorderRadius.circular(20),
                     child: Container(
