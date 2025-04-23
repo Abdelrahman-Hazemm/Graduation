@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ru2ya/devices.dart';
-
+import 'package:ru2ya/pages/devices.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});
@@ -8,7 +7,6 @@ class Welcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       backgroundColor: Colors.white,
       body: Column(
         children: [
@@ -41,14 +39,18 @@ class Welcome extends StatelessWidget {
               color: Color(0xFF0075F9),
             ),
           ),
-          const SizedBox(height:70.0),
+          const SizedBox(height: 70.0),
           InkWell(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => Devices(),),);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => Devices(),
+                ),
+              );
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
               decoration: BoxDecoration(
                 color: const Color(0xFF0075f9),
                 borderRadius: BorderRadius.circular(20.0),
@@ -56,7 +58,8 @@ class Welcome extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset('assets/caregiver.png',
+                  Image.asset(
+                    'assets/caregiver.png',
                     width: 50.0,
                     height: 50.0,
                   ),
@@ -70,19 +73,19 @@ class Welcome extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 25.0),
-
                 ],
               ),
             ),
           ),
-          const SizedBox(height:40.0),
+          const SizedBox(height: 40.0),
           InkWell(
             onTap: () {
               // Navigator.of(context).push(MaterialPageRoute(
               //   builder: (context) =>const Welcome(),),);
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0,vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 16.0),
               decoration: BoxDecoration(
                 color: const Color(0xFF0075f9),
                 borderRadius: BorderRadius.circular(20.0),
@@ -90,7 +93,8 @@ class Welcome extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset('assets/glasses.png',
+                  Image.asset(
+                    'assets/glasses.png',
                     width: 50.0,
                     height: 50.0,
                   ),
@@ -104,7 +108,6 @@ class Welcome extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 25.0),
-
                 ],
               ),
             ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ru2ya/devices.dart';
+import 'package:ru2ya/pages/devices.dart';
 
 class Caregiver extends StatelessWidget {
   const Caregiver({super.key});
@@ -25,7 +25,6 @@ class Caregiver extends StatelessWidget {
           ),
         ),
       ),
-
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ru2ya/welcome.dart';
+import 'package:ru2ya/pages/welcome.dart';
 
 class Start extends StatelessWidget {
   @override
@@ -67,8 +67,11 @@ class Start extends StatelessWidget {
           const SizedBox(height: 20),
           InkWell(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) =>const Welcome(),),);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const Welcome(),
+                ),
+              );
             },
             borderRadius: BorderRadius.circular(15.0),
             child: Container(

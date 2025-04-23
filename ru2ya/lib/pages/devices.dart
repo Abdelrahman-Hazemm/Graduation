@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ru2ya/caregiver.dart';
-import 'package:ru2ya/details.dart';
-import 'package:ru2ya/welcome.dart';
+import 'package:ru2ya/pages/caregiver.dart';
+import 'package:ru2ya/pages/details.dart';
+import 'package:ru2ya/pages/welcome.dart';
 
 class Devices extends StatelessWidget {
   final List<Map<String, String>> devices = [
@@ -37,7 +37,8 @@ class Devices extends StatelessWidget {
       body: ListView(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -52,13 +53,12 @@ class Devices extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 ...devices.map(
-                      (device) => Column(
+                  (device) => Column(
                     children: [
                       InkWell(
                         onTap: () {
-                          Navigator.of(context)
-                              .push(MaterialPageRoute(builder: (context) => const Details()));
-
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => const Details()));
                         },
                         child: ListTile(
                           leading: Container(
@@ -70,7 +70,8 @@ class Devices extends StatelessWidget {
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Image.asset('assets/glasses.png', width: 40),
+                              child:
+                                  Image.asset('assets/glasses.png', width: 40),
                             ),
                           ),
                           title: Text(
@@ -88,7 +89,9 @@ class Devices extends StatelessWidget {
                           trailing: Text(
                             device["status"]!,
                             style: TextStyle(
-                              color: device["status"] == "Reconnect" ? Colors.red : Colors.green,
+                              color: device["status"] == "Reconnect"
+                                  ? Colors.red
+                                  : Colors.green,
                               fontWeight: FontWeight.bold,
                               fontSize: 13.0,
                             ),
@@ -115,7 +118,8 @@ class Devices extends StatelessWidget {
                 ));
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 27.0, vertical: 5.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 27.0, vertical: 5.0),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0075f9),
                   borderRadius: BorderRadius.circular(20.0),

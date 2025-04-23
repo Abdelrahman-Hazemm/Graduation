@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ru2ya/devices.dart';
-import 'package:ru2ya/info.dart';
+import 'package:ru2ya/pages/devices.dart';
+import 'package:ru2ya/pages/info.dart';
 
 class Details extends StatefulWidget {
   const Details({super.key});
@@ -50,7 +50,8 @@ class _DetailsState extends State<Details> {
     if (permission == LocationPermission.deniedForever) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Location permissions permanently denied")),
+          const SnackBar(
+              content: Text("Location permissions permanently denied")),
         );
       }
       _isLoadingLocation = false;
@@ -166,7 +167,8 @@ class _DetailsState extends State<Details> {
                           child: CircleAvatar(
                             backgroundColor: Colors.white,
                             child: IconButton(
-                              icon: const Icon(Icons.my_location, color: Colors.blue),
+                              icon: const Icon(Icons.my_location,
+                                  color: Colors.blue),
                               onPressed: _getUserLocation,
                             ),
                           ),
