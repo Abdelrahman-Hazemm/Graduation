@@ -16,7 +16,7 @@ class Details extends StatefulWidget {
 
 class _DetailsState extends State<Details> {
   GoogleMapController? _mapController;
-  LatLng _currentPosition = const LatLng(30.0444, 31.2357);
+  LatLng _currentPosition = const LatLng(30.0603153, 30.9498286);
   Set<Marker> _markers = {};
   bool _isLoadingLocation = false;
   StreamSubscription<DocumentSnapshot>? _locationSubscription;
