@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ru2ya/pages/devices.dart';
 import 'package:ru2ya/pages/impaired.dart';
+import 'package:ru2ya/pages/qr_connection.dart';
 
 class Welcome extends StatelessWidget {
   const Welcome({super.key});
@@ -112,6 +113,46 @@ class Welcome extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 25.0),
+                  
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 40.0),
+          InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => WifiQrGeneratorPage(),
+                ),
+              );
+            },
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 16.0),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0075f9),
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/glasses.png',
+                    width: 50.0,
+                    height: 50.0,
+                  ),
+                  const SizedBox(width: 25.0),
+                  const Text(
+                    'GENERATE QR',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                    ),
+                  ),
+                  const SizedBox(width: 25.0),
+                  
                 ],
               ),
             ),
