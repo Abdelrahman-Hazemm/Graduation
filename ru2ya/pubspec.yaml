@@ -72,6 +72,8 @@ flutter:
     - assets/Group.png
     - assets/Groupp.png
     - assets/visible.png
+    - assets/qrr.png
+    - assets/bluetooth.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

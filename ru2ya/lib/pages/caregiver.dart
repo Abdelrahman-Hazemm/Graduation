@@ -48,7 +48,7 @@ class Caregiver extends StatelessWidget {
                   Image.asset('assets/QR.png', width: 270),
                   Positioned(
                     top: 60,
-                    child: Image.asset('assets/Group.png', height: 210),
+                    child: Image.asset('assets/qrr.png', height: 210),
                   ),
                 ],
               ),
