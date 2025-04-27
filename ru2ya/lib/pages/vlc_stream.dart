@@ -27,11 +27,27 @@ class VlcStreamPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Open Stream in VLC')),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () => _launchVlc(context),
-          child: Text('Open Stream in VLC'),
+        child: InkWell(
+          onTap: () => _launchVlc(context),
+          borderRadius: BorderRadius.circular(12.0), // optional, for ripple effect
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            decoration: BoxDecoration(
+              color: Colors.blue, // button color
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: const Text(
+              'Open Stream in VLC',
+              style: TextStyle(
+                color: Colors.white, // text color
+                fontWeight: FontWeight.bold,
+                fontSize: 18.0,
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
+
 }

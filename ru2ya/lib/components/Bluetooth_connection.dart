@@ -72,37 +72,99 @@ class _BluetoothPageState extends State<BluetoothPage> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Bluetooth Devices")),
       body: Column(
         children: [
-          ElevatedButton(
-            onPressed: _checkBluetoothStatus,
-            child: const Text("Check Bluetooth Status"),
+          const SizedBox(height:15),
+          InkWell(
+            onTap: _checkBluetoothStatus,
+            borderRadius: BorderRadius.circular(12.0), // nice ripple
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              decoration: BoxDecoration(
+                color: Colors.blue, // background color
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: const Text(
+                "Check Bluetooth Status",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0,
+                ),
+              ),
+            ),
           ),
-          ElevatedButton(
-            onPressed: _startScan,
-            child: const Text("Scan for Devices"),
+
+          const SizedBox(height: 16.0),
+
+          InkWell(
+            onTap: _startScan,
+            borderRadius: BorderRadius.circular(12.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: const Text(
+                "Scan for Devices",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0,
+                ),
+              ),
+            ),
           ),
+          const SizedBox(height:20.0),
+
           Expanded(
             child: ListView.builder(
               itemCount: scanResults.length,
               itemBuilder: (context, index) {
                 final result = scanResults[index];
                 final device = result.device;
-
                 return ListTile(
                   title: Text(device.platformName.isNotEmpty
                       ? device.platformName
-                      : "Unnamed Device"),
-                  subtitle: Text(device.remoteId.toString()),
-                  trailing: ElevatedButton(
-                    onPressed: () => _connectToDevice(device),
-                    child: const Text("Connect"),
+                      : "Unnamed Device",
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+
                   ),
+                  subtitle: Text(device.remoteId.toString(),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                  ),
+                  ),
+                  trailing: InkWell(
+                    onTap: () => _connectToDevice(device),
+                    borderRadius: BorderRadius.circular(12.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                      decoration: BoxDecoration(
+                        color: Colors.blue, // background color
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      child: const Text(
+                        "Connect",
+                        style: TextStyle(
+                          color: Colors.white, // text color
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ),
+                  ),
+
                 );
               },
             ),
