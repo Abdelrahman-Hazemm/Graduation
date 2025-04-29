@@ -8,7 +8,14 @@ import 'package:ru2ya/pages/vlc_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Details extends StatefulWidget {
-  const Details({super.key});
+  final Map<String, dynamic> blindUserData;
+  final Map<String, dynamic> deviceData;
+
+  const Details({
+    Key? key,
+    required this.blindUserData,
+    required this.deviceData,
+  }) : super(key: key);
 
   @override
   _DetailsState createState() => _DetailsState();
@@ -16,21 +23,62 @@ class Details extends StatefulWidget {
 
 class _DetailsState extends State<Details> {
   GoogleMapController? _mapController;
-  LatLng _currentPosition = const LatLng(30.0603153, 30.9498286);
+  late LatLng _currentPosition;
   Set<Marker> _markers = {};
   bool _isLoadingLocation = false;
   StreamSubscription<DocumentSnapshot>? _locationSubscription;
-  final String blindUserId = "blind_user_1";
+  StreamSubscription<DocumentSnapshot>? _deviceSubscription;
+  late String blindUserId;
+  late String deviceId;
+  String currentMode = "Loading...";
 
   @override
   void initState() {
     super.initState();
+    blindUserId = widget.blindUserData['id'] ?? "blind_user_1";
+    deviceId = widget.deviceData['id'] ?? "device_1";
+    currentMode = widget.deviceData['mode'] ?? "No mode set";
+    _initializePosition();
     _listenToBlindUserLocation();
+    _listenToDeviceUpdates();
+  }
+
+  void _initializePosition() {
+    final location = widget.blindUserData['location'] as GeoPoint?;
+    _currentPosition = location != null
+        ? LatLng(location.latitude, location.longitude)
+        : const LatLng(30.0603153, 30.9498286);
+    _updateMarkers();
+  }
+
+  void _listenToDeviceUpdates() {
+    _deviceSubscription = FirebaseFirestore.instance
+        .collection('devices')
+        .doc(deviceId)
+        .snapshots()
+        .listen((DocumentSnapshot snapshot) {
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        if (mounted) {
+          setState(() {
+            currentMode = data['mode'] ?? "No mode set";
+          });
+        }
+      }
+    }, onError: (error) {
+      print("Error listening to device updates: $error");
+      if (mounted) {
+        setState(() {
+          currentMode = "Error loading mode";
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _locationSubscription?.cancel();
+    _deviceSubscription?.cancel();
     super.dispose();
   }
 
@@ -102,7 +150,8 @@ class _DetailsState extends State<Details> {
       Marker(
         markerId: MarkerId(blindUserId),
         position: _currentPosition,
-        infoWindow: const InfoWindow(title: "Blind User"),
+        infoWindow:
+            InfoWindow(title: widget.blindUserData['name'] ?? 'Blind User'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       ),
     );
@@ -184,16 +233,16 @@ class _DetailsState extends State<Details> {
 
   @override
   Widget build(BuildContext context) {
+    final userName = widget.blindUserData['name'] ?? 'Unknown User';
+    final deviceStatus = widget.deviceData['status'] ?? 'Unknown';
+    final batteryLevel = widget.deviceData['battery'] ?? 'N/A';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => Devices()),
-            );
-          },
+          onPressed: () => Navigator.pop(context),
           icon: Image.asset(
             'assets/arrow-left.png',
             width: 35,
@@ -201,18 +250,19 @@ class _DetailsState extends State<Details> {
             color: Colors.black,
           ),
         ),
+        title: Text(
+          userName,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
-          SizedBox(
-            width: 60,
-            height: 60,
-            child: IconButton(
-              icon: const Icon(Icons.info, color: Colors.blue, size: 35),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Info()),
-                );
-              },
+          IconButton(
+            icon: const Icon(Icons.info, color: Colors.blue, size: 35),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Info()),
             ),
           ),
         ],
@@ -234,7 +284,7 @@ class _DetailsState extends State<Details> {
                             target: _currentPosition,
                             zoom: 15,
                           ),
-                          onMapCreated: (GoogleMapController controller) {
+                          onMapCreated: (controller) {
                             _mapController = controller;
                             _updateMarkers();
                           },
@@ -282,9 +332,9 @@ class _DetailsState extends State<Details> {
                                 const Icon(Icons.person_pin_circle,
                                     color: Colors.red),
                                 const SizedBox(width: 8),
-                                const Text(
-                                  "Tracking Blind User",
-                                  style: TextStyle(
+                                Text(
+                                  "Tracking $userName",
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -297,16 +347,16 @@ class _DetailsState extends State<Details> {
                   ),
                 ),
                 const SizedBox(height: 25),
-                _buildStatusCard(),
+                _buildStatusCard(deviceStatus, batteryLevel),
                 const SizedBox(height: 25),
-                _buildActionTile("OBJECT\nDETECTION MODE", "assets/object.png",
-                    const Color(0xFF4ACD12), () {}),
+                _buildModeTile(),
                 const SizedBox(height: 25),
                 _buildActionTile("My Glasses", "assets/glasses.png",
                     const Color(0xFF0075f9), () {}),
                 const SizedBox(height: 25),
-                _buildActionTile("Live Feed", "assets/visible.png",
-                    const Color(0xFF0075f9), () {
+                _buildActionTile(
+                    "Live Feed", "assets/visible.png", const Color(0xFF0075f9),
+                    () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => VlcStreamPage()),
@@ -321,15 +371,15 @@ class _DetailsState extends State<Details> {
     );
   }
 
-  Widget _buildStatusCard() {
+  Widget _buildStatusCard(String status, String battery) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFF4ACD12),
+        color: status == "Connected" ? const Color(0xFF4ACD12) : Colors.red,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.0),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -337,17 +387,17 @@ class _DetailsState extends State<Details> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "CONNECTED",
-                  style: TextStyle(
+                  status.toUpperCase(),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  "8hr Remaining",
-                  style: TextStyle(
+                  "Battery: $battery",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                   ),
@@ -355,8 +405,8 @@ class _DetailsState extends State<Details> {
               ],
             ),
             Text(
-              "80%",
-              style: TextStyle(
+              "$battery",
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 25,
                   fontWeight: FontWeight.bold),
@@ -367,7 +417,58 @@ class _DetailsState extends State<Details> {
     );
   }
 
-  Widget _buildActionTile(String title, String asset, Color color, Function() onTap) {
+  Widget _buildModeTile() {
+    return InkWell(
+      onTap: () {},
+      child: Material(
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF4ACD12),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/object.png',
+                width: 55,
+                height: 55,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: 40.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "CURRENT MODE",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    currentMode,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionTile(
+      String title, String asset, Color color, Function() onTap) {
     return InkWell(
       onTap: onTap,
       child: Material(
@@ -390,7 +491,6 @@ class _DetailsState extends State<Details> {
               const SizedBox(width: 40.0),
               Text(
                 title,
-                textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,

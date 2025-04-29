@@ -28,7 +28,6 @@ class _DevicesState extends State<Devices> {
     });
 
     try {
-      // Fetch caregiver document
       DocumentSnapshot caregiverDoc =
           await _firestore.collection('caregivers').doc(caregiverId).get();
 
@@ -36,7 +35,6 @@ class _DevicesState extends State<Devices> {
         Map<String, dynamic> caregiverData =
             caregiverDoc.data() as Map<String, dynamic>;
 
-        // Get assignedBlindUsers reference
         DocumentReference? blindUserRef;
         if (caregiverData.containsKey('assignedBlindUsers')) {
           dynamic assignedUser = caregiverData['assignedBlindUsers'];
@@ -46,13 +44,11 @@ class _DevicesState extends State<Devices> {
         }
 
         if (blindUserRef != null) {
-          // Fetch the blind user's assigned device
           DocumentSnapshot blindUserDoc = await blindUserRef.get();
           if (blindUserDoc.exists) {
             Map<String, dynamic> userData =
                 blindUserDoc.data() as Map<String, dynamic>;
 
-            // Get device reference from blind user
             DocumentReference? deviceRef;
             if (userData.containsKey('assignedDevice')) {
               deviceRef = userData['assignedDevice'];
@@ -66,7 +62,7 @@ class _DevicesState extends State<Devices> {
 
                 devices.add({
                   "id": deviceDoc.id,
-                  "name": deviceData['model'] ?? 'Unnamed Device',
+                  "mode": deviceData['mode'] ?? 'No mode set',
                   "userName": userData['name'] ?? 'Unknown User',
                   "status": deviceData['wifiConnected']
                       ? "Connected"
@@ -75,6 +71,10 @@ class _DevicesState extends State<Devices> {
                   "temperature": deviceData['temperature'] ?? 'N/A',
                   "lastUpdated":
                       deviceData['timestamp']?.toString() ?? 'Unknown',
+                  "blindUserData": {
+                    ...userData,
+                    "id": blindUserDoc.id,
+                  },
                 });
               }
             }
@@ -155,8 +155,14 @@ class _DevicesState extends State<Devices> {
                                 InkWell(
                                   onTap: () {
                                     Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) => Details()));
+                                      MaterialPageRoute(
+                                        builder: (context) => Details(
+                                          blindUserData:
+                                              device["blindUserData"],
+                                          deviceData: device,
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: ListTile(
                                     leading: Container(
@@ -174,7 +180,7 @@ class _DevicesState extends State<Devices> {
                                       ),
                                     ),
                                     title: Text(
-                                      device["name"],
+                                      "Assigned to: ${device["userName"]}",
                                       style: const TextStyle(
                                         fontSize: 16,
                                         color: Color(0xFF0075f9),
@@ -185,10 +191,6 @@ class _DevicesState extends State<Devices> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          "Assigned to: ${device["userName"]}",
-                                          style: const TextStyle(fontSize: 12),
-                                        ),
                                         Text(
                                           "Battery: ${device["battery"]} | Temp: ${device["temperature"]}",
                                           style: const TextStyle(fontSize: 12),
