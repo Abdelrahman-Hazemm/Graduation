@@ -60,13 +60,16 @@ class _DevicesState extends State<Devices> {
                 Map<String, dynamic> deviceData =
                     deviceDoc.data() as Map<String, dynamic>;
 
+                // Store wifiConnected status for use in Details page
+                bool wifiConnected = deviceData['wifiConnected'] == true;
+
                 devices.add({
                   "id": deviceDoc.id,
                   "mode": deviceData['mode'] ?? 'No mode set',
                   "userName": userData['name'] ?? 'Unknown User',
-                  "status": deviceData['wifiConnected']
-                      ? "Connected"
-                      : "Disconnected",
+                  "status": wifiConnected ? "Connected" : "Disconnected",
+                  "wifiConnected":
+                      wifiConnected, // Explicitly store the boolean
                   "battery": deviceData['battery'] ?? 'N/A',
                   "temperature": deviceData['temperature'] ?? 'N/A',
                   "lastUpdated":

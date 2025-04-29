@@ -31,6 +31,8 @@ class _DetailsState extends State<Details> {
   late String blindUserId;
   late String deviceId;
   String currentMode = "Loading...";
+  String batteryLevel = "Loading...";
+  bool isDeviceConnected = false; // Will store wifiConnected status
 
   @override
   void initState() {
@@ -38,6 +40,9 @@ class _DetailsState extends State<Details> {
     blindUserId = widget.blindUserData['id'] ?? "blind_user_1";
     deviceId = widget.deviceData['id'] ?? "device_1";
     currentMode = widget.deviceData['mode'] ?? "No mode set";
+    batteryLevel = widget.deviceData['battery'] ?? "N/A";
+    // Use wifiConnected status instead of ip
+    isDeviceConnected = widget.deviceData['status'] == "Connected";
     _initializePosition();
     _listenToBlindUserLocation();
     _listenToDeviceUpdates();
@@ -62,6 +67,9 @@ class _DetailsState extends State<Details> {
         if (mounted) {
           setState(() {
             currentMode = data['mode'] ?? "No mode set";
+            batteryLevel = data['battery'] ?? "N/A";
+            // Use wifiConnected status instead of ip
+            isDeviceConnected = data['wifiConnected'] == true;
           });
         }
       }
@@ -69,7 +77,9 @@ class _DetailsState extends State<Details> {
       print("Error listening to device updates: $error");
       if (mounted) {
         setState(() {
-          currentMode = "Error loading mode";
+          currentMode = "Error loading data";
+          batteryLevel = "Error";
+          isDeviceConnected = false; // Default to disconnected on error
         });
       }
     });
@@ -234,8 +244,6 @@ class _DetailsState extends State<Details> {
   @override
   Widget build(BuildContext context) {
     final userName = widget.blindUserData['name'] ?? 'Unknown User';
-    final deviceStatus = widget.deviceData['status'] ?? 'Unknown';
-    final batteryLevel = widget.deviceData['battery'] ?? 'N/A';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -347,12 +355,15 @@ class _DetailsState extends State<Details> {
                   ),
                 ),
                 const SizedBox(height: 25),
-                _buildStatusCard(deviceStatus, batteryLevel),
+                _buildStatusCard(),
                 const SizedBox(height: 25),
                 _buildModeTile(),
                 const SizedBox(height: 25),
-                _buildActionTile("My Glasses", "assets/glasses.png",
-                    const Color(0xFF0075f9), () {}),
+                _buildActionTile(
+                    "My Glasses", "assets/glasses.png", const Color(0xFF0075f9),
+                    () {
+                  // Add navigation to glasses management page when implemented
+                }),
                 const SizedBox(height: 25),
                 _buildActionTile(
                     "Live Feed", "assets/visible.png", const Color(0xFF0075f9),
@@ -371,11 +382,11 @@ class _DetailsState extends State<Details> {
     );
   }
 
-  Widget _buildStatusCard(String status, String battery) {
+  Widget _buildStatusCard() {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: status == "Connected" ? const Color(0xFF4ACD12) : Colors.red,
+        color: isDeviceConnected ? const Color(0xFF4ACD12) : Colors.red,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
@@ -387,7 +398,7 @@ class _DetailsState extends State<Details> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  status.toUpperCase(),
+                  isDeviceConnected ? "CONNECTED" : "DISCONNECTED",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -396,7 +407,7 @@ class _DetailsState extends State<Details> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  "Battery: $battery",
+                  "Battery: $batteryLevel",
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -405,7 +416,7 @@ class _DetailsState extends State<Details> {
               ],
             ),
             Text(
-              "$battery",
+              batteryLevel,
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 25,
@@ -419,49 +430,48 @@ class _DetailsState extends State<Details> {
 
   Widget _buildModeTile() {
     return InkWell(
-      onTap: () {},
-      child: Material(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: const Color(0xFF4ACD12),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/object.png',
-                width: 55,
-                height: 55,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(width: 40.0),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "CURRENT MODE",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+      onTap: () {
+        // Could open a modal to change the mode in the future
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF4ACD12),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/object.png',
+              width: 55,
+              height: 55,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 40.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "CURRENT MODE",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 5),
-                  Text(
-                    currentMode,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  currentMode,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -471,34 +481,31 @@ class _DetailsState extends State<Details> {
       String title, String asset, Color color, Function() onTap) {
     return InkWell(
       onTap: onTap,
-      child: Material(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                asset,
-                width: 55,
-                height: 55,
-                fit: BoxFit.contain,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              asset,
+              width: 55,
+              height: 55,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 40.0),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(width: 40.0),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
