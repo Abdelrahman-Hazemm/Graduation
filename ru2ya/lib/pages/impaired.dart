@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:http/http.dart' as http;
 
 class ImpairedPage extends StatefulWidget {
   const ImpairedPage({Key? key}) : super(key: key);
@@ -14,6 +16,7 @@ class ImpairedPage extends StatefulWidget {
 class _ImpairedPageState extends State<ImpairedPage> {
   final String blindUserId = "blind_user_1";
   Timer? _locationTimer;
+  Timer? _apiTimer;
   bool _isTracking = false;
   String _statusMessage = "Initializing location tracking...";
 
@@ -21,6 +24,7 @@ class _ImpairedPageState extends State<ImpairedPage> {
   void initState() {
     super.initState();
     _initLocationTracking();
+    _startApiMonitoring(); // Starts the API listener when page opens
   }
 
   Future<void> _initLocationTracking() async {
@@ -88,8 +92,9 @@ class _ImpairedPageState extends State<ImpairedPage> {
 
   Future<void> _sendLocationToFirebase(Position position) async {
     try {
-      final docRef =
-          FirebaseFirestore.instance.collection('blind_users').doc(blindUserId);
+      final docRef = FirebaseFirestore.instance
+          .collection('blind_users')
+          .doc(blindUserId);
 
       final docSnapshot = await docRef.get();
 
@@ -118,9 +123,41 @@ class _ImpairedPageState extends State<ImpairedPage> {
     }
   }
 
+  void _startApiMonitoring() {
+  _apiTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://ruya-production.up.railway.app/api/status'));
+      if (response.statusCode == 200) {
+        final rawData = jsonDecode(response.body);
+
+        // Rename "model" to "mode" if present
+        final Map<String, dynamic> data = Map<String, dynamic>.from(rawData);
+        if (data.containsKey('model')) {
+          data['mode'] = data['model'];
+          data.remove('model');
+        }
+
+        await FirebaseFirestore.instance
+            .collection('devices')
+            .doc('deviceData1')
+            .set(data);
+
+        print("API data (with 'mode') updated to Firebase: $data");
+      } else {
+        print("Failed to fetch API: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching API: $e");
+    }
+  });
+}
+
+
   @override
   void dispose() {
     _locationTimer?.cancel();
+    _apiTimer?.cancel();
     super.dispose();
   }
 
