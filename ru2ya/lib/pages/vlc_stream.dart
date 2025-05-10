@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:android_intent_plus/android_intent.dart';
+import 'package:http/http.dart' as http;
 
 class VlcStreamPage extends StatefulWidget {
   @override
@@ -10,11 +10,12 @@ class VlcStreamPage extends StatefulWidget {
 }
 
 class _VlcStreamPageState extends State<VlcStreamPage> {
-  final String requestId = 'streamRequest1'; // You can make this dynamic (e.g., user ID)
+  final String requestId = 'glasses01';
   final String rtmpUrl = 'rtmp://trolley.proxy.rlwy.net:24127/stream';
 
   StreamSubscription<DocumentSnapshot>? _subscription;
   Timer? _timeoutTimer;
+  bool _isStreaming = false;
 
   Future<void> _sendRequest() async {
     final requestRef = FirebaseFirestore.instance.collection('requests').doc(requestId);
@@ -31,6 +32,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
       'status': 'pending',
       'timestamp': FieldValue.serverTimestamp(),
       'streamUrl': rtmpUrl,
+      'stream': true,
     });
 
     _waitForResponse(requestRef);
@@ -50,6 +52,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
 
       if (status == 'accepted') {
         _cancelTimeout();
+        setState(() => _isStreaming = true);
         _launchVlc();
       } else if (status == 'rejected') {
         _cancelTimeout();
@@ -104,6 +107,29 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     }
   }
 
+  Future<void> _stopStream() async {
+    const stopUrl = 'https://ruya-production.up.railway.app/api/stream/stop-stream';
+
+    try {
+      final response = await http.post(Uri.parse(stopUrl));
+
+      if (response.statusCode == 200) {
+        setState(() => _isStreaming = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Stream stopped successfully.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to stop stream. Status: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error stopping stream: $e')),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _subscription?.cancel();
@@ -116,24 +142,50 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     return Scaffold(
       appBar: AppBar(title: Text('Stream Request')),
       body: Center(
-        child: InkWell(
-          onTap: _sendRequest,
-          borderRadius: BorderRadius.circular(12.0),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-            decoration: BoxDecoration(
-              color: Colors.blue,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: _sendRequest,
               borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: const Text(
-              'Request Stream',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18.0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: const Text(
+                  'Request Stream',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18.0,
+                  ),
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 20),
+            if (_isStreaming)
+              InkWell(
+                onTap: _stopStream,
+                borderRadius: BorderRadius.circular(12.0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: const Text(
+                    'Stop Stream',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
