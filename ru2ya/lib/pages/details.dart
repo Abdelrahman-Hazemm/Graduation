@@ -251,10 +251,9 @@ class _DetailsState extends State<Details> {
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: Image.asset(
-            'assets/arrow-left.png',
-            width: 35,
-            height: 35,
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
             color: Colors.black,
           ),
         ),
@@ -456,7 +455,7 @@ class _DetailsState extends State<Details> {
                   "CURRENT MODE",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -465,7 +464,7 @@ class _DetailsState extends State<Details> {
                   currentMode,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

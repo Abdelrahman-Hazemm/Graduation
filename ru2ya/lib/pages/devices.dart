@@ -191,11 +191,16 @@ class _DevicesState extends State<Devices> {
                                 children: [
                                   Text(
                                     "Battery: ${device["battery"]} | Temp: ${device["temperature"]}",
-                                    style: const TextStyle(fontSize: 12),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      ),
                                   ),
                                   Text(
                                     device["lastUpdated"],
-                                    style: const TextStyle(color: Colors.grey),
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,                                  
+                                      ),
                                   ),
                                 ],
                               ),

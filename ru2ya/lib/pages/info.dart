@@ -9,19 +9,17 @@ class Info extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         elevation: 0,
-        leading: IconButton(
-          icon: Image.asset(
-            'assets/arrow-left.png',
+      leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(
+            Icons.arrow_back,
+            size: 30,
             color: Colors.white,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
         ),
       ),
       body: Stack(
         children: [
-          // Blue Background
           Container(
             color: Colors.blue,
             width: double.infinity,
@@ -34,16 +32,16 @@ class Info extends StatelessWidget {
             right: 0,
             child: Container(
               width: double.infinity,
-              height: MediaQuery.of(context).size.height - 100, // Remaining height
+              height: MediaQuery.of(context).size.height - 100, 
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30), // Circular edges
+                  topLeft: Radius.circular(30), 
                   topRight: Radius.circular(30),
                 ),
               ),
               child: const Padding(
-                padding: EdgeInsets.all(20), // General padding
+                padding: EdgeInsets.all(20), 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -60,7 +58,7 @@ class Info extends StatelessWidget {
                     SizedBox(height: 40),
 
                     Padding(
-                      padding: EdgeInsets.only(left: 10), // Added left padding
+                      padding: EdgeInsets.only(left: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -81,7 +79,7 @@ class Info extends StatelessWidget {
                     Divider(thickness: 1, color: Colors.black),
 
                     Padding(
-                      padding: EdgeInsets.only(left: 10), // Added left padding
+                      padding: EdgeInsets.only(left: 10), 
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -102,9 +100,8 @@ class Info extends StatelessWidget {
                     ),
                     Divider(thickness: 1, color: Colors.black),
 
-                    /// **Phone Number Section**
                     Padding(
-                      padding: EdgeInsets.only(left: 10), // Added left padding
+                      padding: EdgeInsets.only(left: 10), 
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -125,9 +122,9 @@ class Info extends StatelessWidget {
                     ),
                     Divider(thickness: 1, color: Colors.black),
 
-                    /// **Date of Birth Section**
+                    
                     Padding(
-                      padding: EdgeInsets.only(left: 10), // Added left padding
+                      padding: EdgeInsets.only(left: 10), 
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -148,9 +145,8 @@ class Info extends StatelessWidget {
                     ),
                     Divider(thickness: 1, color: Colors.black),
 
-                    /// **Gender Section**
                     Padding(
-                      padding: EdgeInsets.only(left: 10), // Added left padding
+                      padding: EdgeInsets.only(left: 10), 
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
