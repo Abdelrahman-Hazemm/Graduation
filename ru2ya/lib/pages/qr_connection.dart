@@ -25,7 +25,7 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
   }
 
   Future<void> _fetchDeviceInfo() async {
-    await Permission.location.request(); // Required for getting Wi-Fi SSID
+    await Permission.location.request();
 
     final info = NetworkInfo();
     final ssid = await info.getWifiName();
@@ -36,7 +36,7 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
     final bluetoothName = "MyPiBridge_$model";
 
     setState(() {
-      _ssid = ssid?.replaceAll('"', ''); // Remove quotes from SSID if present
+      _ssid = ssid?.replaceAll('"', '');
       _bluetoothName = bluetoothName;
     });
   }
