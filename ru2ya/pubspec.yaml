@@ -51,6 +51,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/logo.jpeg"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -75,6 +82,7 @@ flutter:
     - assets/visible.png
     - assets/qrr.png
     - assets/bluetooth.png
+    - assets/logo.jpeg
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

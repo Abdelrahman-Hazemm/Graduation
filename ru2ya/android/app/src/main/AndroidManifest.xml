@@ -20,7 +20,7 @@
 
 
     <application
-        android:label="ru2ya"
+        android:label="Ru2ya"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
