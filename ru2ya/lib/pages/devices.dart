@@ -101,7 +101,7 @@ class _DevicesState extends State<Devices> {
       ),
       backgroundColor: Colors.white,
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _getDeviceStream(),  // Stream listens for real-time updates
+        stream: _getDeviceStream(), // Stream listens for real-time updates
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -193,14 +193,14 @@ class _DevicesState extends State<Devices> {
                                     "Battery: ${device["battery"]} | Temp: ${device["temperature"]}",
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      ),
+                                    ),
                                   ),
                                   Text(
                                     device["lastUpdated"],
                                     style: const TextStyle(
                                       color: Colors.grey,
-                                      fontSize: 12,                                  
-                                      ),
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -240,9 +240,10 @@ class _DevicesState extends State<Devices> {
     return Center(
       child: InkWell(
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const Caregiver(),
-          ));
+          // Show the SnackBar to indicate that the feature is coming soon
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("This feature is coming soon!")),
+          );
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 27.0, vertical: 5.0),
@@ -260,9 +261,10 @@ class _DevicesState extends State<Devices> {
               ),
               const SizedBox(width: 20.0),
               const Text(
-                'ADD NEW GLASSES',
+                'ADD NEW GLASSES ',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors
+                      .white70, // Slightly lighter color to show it’s not available yet
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
                 ),

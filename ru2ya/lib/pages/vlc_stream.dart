@@ -11,11 +11,12 @@ class VlcStreamPage extends StatefulWidget {
 
 class _VlcStreamPageState extends State<VlcStreamPage> {
   final String requestId = 'glasses01';
-  final String rtmpUrl = 'rtmp://trolley.proxy.rlwy.net:24127/stream';
+  final String baseStreamUrl = 'rtmp://trolley.proxy.rlwy.net:24127/stream';
 
   StreamSubscription<DocumentSnapshot>? _subscription;
   Timer? _timeoutTimer;
   bool _isStreaming = false;
+  String? _fullStreamUrl;
 
   Future<void> _sendRequest() async {
     final requestRef = FirebaseFirestore.instance.collection('requests').doc(requestId);
@@ -31,7 +32,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     await requestRef.set({
       'status': 'pending',
       'timestamp': FieldValue.serverTimestamp(),
-      'streamUrl': rtmpUrl,
+      'streamUrl': baseStreamUrl,
       'stream': true,
     });
 
@@ -52,8 +53,17 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
 
       if (status == 'accepted') {
         _cancelTimeout();
-        setState(() => _isStreaming = true);
-        _launchVlc();
+
+        final uniqueId = data['uniqueId'];
+        if (uniqueId != null && uniqueId is String) {
+          _fullStreamUrl = '$baseStreamUrl/$uniqueId';
+          setState(() => _isStreaming = true);
+          _launchVlc();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Stream accepted but no unique ID found.')),
+          );
+        }
       } else if (status == 'rejected') {
         _cancelTimeout();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -92,10 +102,17 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
   }
 
   Future<void> _launchVlc() async {
+    if (_fullStreamUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No stream URL found.')),
+      );
+      return;
+    }
+
     try {
       final intent = AndroidIntent(
         action: 'action_view',
-        data: rtmpUrl,
+        data: _fullStreamUrl,
         package: 'org.videolan.vlc',
       );
       await intent.launch();
@@ -114,7 +131,10 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
       final response = await http.post(Uri.parse(stopUrl));
 
       if (response.statusCode == 200) {
-        setState(() => _isStreaming = false);
+        setState(() {
+          _isStreaming = false;
+          _fullStreamUrl = null;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Stream stopped successfully.')),
         );
