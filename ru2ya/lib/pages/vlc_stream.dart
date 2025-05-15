@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:android_intent_plus/android_intent.dart';
@@ -11,7 +12,8 @@ class VlcStreamPage extends StatefulWidget {
 
 class _VlcStreamPageState extends State<VlcStreamPage> {
   final String requestId = 'glasses01';
-  final String baseStreamUrl = 'rtmp://trolley.proxy.rlwy.net:24127/stream';
+  final String fetchStreamUrlEndpoint =
+      'https://ruya-production.up.railway.app/api/stream/get-stream-url?deviceId=glasses01';
 
   StreamSubscription<DocumentSnapshot>? _subscription;
   Timer? _timeoutTimer;
@@ -19,10 +21,13 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
   String? _fullStreamUrl;
 
   Future<void> _sendRequest() async {
-    final requestRef = FirebaseFirestore.instance.collection('requests').doc(requestId);
+    final requestRef =
+        FirebaseFirestore.instance.collection('requests').doc(requestId);
 
     final doc = await requestRef.get();
-    if (doc.exists && doc.data() is Map && (doc.data() as Map)['status'] == 'pending') {
+    if (doc.exists &&
+        doc.data() is Map &&
+        (doc.data() as Map)['status'] == 'pending') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Request already pending. Please wait.')),
       );
@@ -32,7 +37,6 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     await requestRef.set({
       'status': 'pending',
       'timestamp': FieldValue.serverTimestamp(),
-      'streamUrl': baseStreamUrl,
       'stream': true,
     });
 
@@ -44,7 +48,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
       SnackBar(content: Text('Waiting for Raspberry Pi response...')),
     );
 
-    _subscription = requestRef.snapshots().listen((snapshot) {
+    _subscription = requestRef.snapshots().listen((snapshot) async {
       final data = snapshot.data() as Map<String, dynamic>?;
 
       if (data == null) return;
@@ -52,18 +56,9 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
       final status = data['status'];
 
       if (status == 'accepted') {
+        print("Request accepted by Pi.");
         _cancelTimeout();
-
-        final uniqueId = data['uniqueId'];
-        if (uniqueId != null && uniqueId is String) {
-          _fullStreamUrl = '$baseStreamUrl/$uniqueId';
-          setState(() => _isStreaming = true);
-          _launchVlc();
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Stream accepted but no unique ID found.')),
-          );
-        }
+        await _fetchStreamUrlAndLaunch();
       } else if (status == 'rejected') {
         _cancelTimeout();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -101,6 +96,35 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     _subscription?.cancel();
   }
 
+  Future<void> _fetchStreamUrlAndLaunch() async {
+    try {
+      final response = await http.get(Uri.parse(fetchStreamUrlEndpoint));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        _fullStreamUrl = data['streamUrl'];
+        print('Fetched stream URL: $_fullStreamUrl');
+
+        if (_fullStreamUrl != null && _fullStreamUrl!.isNotEmpty) {
+          setState(() => _isStreaming = true);
+          _launchVlc();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Empty stream URL received.')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to get stream URL.')),
+        );
+      }
+    } catch (e) {
+      debugPrint('Fetch stream URL error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching stream URL: $e')),
+      );
+    }
+  }
+
   Future<void> _launchVlc() async {
     if (_fullStreamUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -115,6 +139,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
         data: _fullStreamUrl,
         package: 'org.videolan.vlc',
       );
+      print('Launching VLC with URL: $_fullStreamUrl');
       await intent.launch();
     } catch (e) {
       debugPrint('Failed to launch VLC: $e');
@@ -125,7 +150,8 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
   }
 
   Future<void> _stopStream() async {
-    const stopUrl = 'https://ruya-production.up.railway.app/api/stream/stop-stream';
+    const stopUrl =
+        'https://ruya-production.up.railway.app/api/stream/stop-stream';
 
     try {
       final response = await http.post(Uri.parse(stopUrl));
@@ -140,7 +166,9 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to stop stream. Status: ${response.statusCode}')),
+          SnackBar(
+              content:
+                  Text('Failed to stop stream. Status: ${response.statusCode}')),
         );
       }
     } catch (e) {
@@ -169,7 +197,8 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
               onTap: _sendRequest,
               borderRadius: BorderRadius.circular(12.0),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
                 decoration: BoxDecoration(
                   color: Colors.blue,
                   borderRadius: BorderRadius.circular(12.0),
@@ -185,26 +214,26 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
               ),
             ),
             const SizedBox(height: 20),
-            if (_isStreaming)
-              InkWell(
-                onTap: _stopStream,
-                borderRadius: BorderRadius.circular(12.0),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: const Text(
-                    'Stop Stream',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                    ),
+            InkWell(
+              onTap: _stopStream,
+              borderRadius: BorderRadius.circular(12.0),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: const Text(
+                  'Stop Stream',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18.0,
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ),
