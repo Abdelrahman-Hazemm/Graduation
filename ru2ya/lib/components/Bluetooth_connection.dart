@@ -29,16 +29,63 @@ class _BluetoothPageState extends State<BluetoothPage> {
 
   void _listenToBluetoothState() {
     FlutterBluePlus.adapterState.listen((state) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Bluetooth is ${state.toString().split('.').last}')),
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          Future.delayed(const Duration(seconds: 1), () {
+            Navigator.of(context).pop();
+          });
+
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            backgroundColor: Colors.white,
+            content: Row(
+              children: [
+                const Icon(Icons.bluetooth, color: Colors.blueAccent),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Bluetooth is ${state.toString().split('.').last}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       );
+
     });
   }
 
   Future<void> _checkBluetoothStatus() async {
     final state = await FlutterBluePlus.adapterState.first;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Bluetooth is ${state == BluetoothAdapterState.on ? "ON" : "OFF"}')),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        Future.delayed(const Duration(seconds: 1), () {
+          Navigator.of(context).pop();
+        });
+
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: Colors.white,
+          content: Row(
+            children: [
+              const Icon(Icons.bluetooth, color: Colors.blueAccent),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Bluetooth is ${state.toString().split('.').last}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -81,7 +128,7 @@ class _BluetoothPageState extends State<BluetoothPage> {
           const SizedBox(height:15),
           InkWell(
             onTap: _checkBluetoothStatus,
-            borderRadius: BorderRadius.circular(12.0), // nice ripple
+            borderRadius: BorderRadius.circular(12.0),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
               decoration: BoxDecoration(

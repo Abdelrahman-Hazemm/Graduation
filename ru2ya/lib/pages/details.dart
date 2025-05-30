@@ -266,7 +266,7 @@ class _DetailsState extends State<Details> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info, color: Colors.blue, size: 35),
+            icon: const Icon(Icons.info, color: Colors.blue, size: 30),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => Info()),

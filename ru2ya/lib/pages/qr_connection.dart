@@ -53,8 +53,9 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
         : null;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Wi-Fi QR Generator"),
+        backgroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,61 +63,178 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
           children: [
             TextField(
               controller: _ssidController,
-              decoration: const InputDecoration(
-                labelText: "Wi-Fi SSID",
-                border: OutlineInputBorder(),
-              ),
               onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                labelText: "Wi-Fi SSID",
+                labelStyle: const TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: Colors.lightBlueAccent.withOpacity(0.05),
+                contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.black12, width: 2),
+                ),
+                prefixIcon: const Icon(Icons.wifi_outlined, color: Colors.grey),
+              ),
+              style: const TextStyle(fontSize: 16),
             ),
+
             const SizedBox(height: 10),
             TextField(
+
               controller: _bluetoothController,
-              decoration: const InputDecoration(
-                labelText: "Bluetooth Name (optional)",
-                border: OutlineInputBorder(),
-              ),
               onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                labelText: "Bluetooth Name (optional)",
+                labelStyle: const TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: Colors.lightBlueAccent.withOpacity(0.05),
+                contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.black12, width: 2),
+                ),
+                prefixIcon: const Icon(Icons.bluetooth, color: Colors.grey),
+              ),
+              style: const TextStyle(fontSize: 16),
             ),
+
             const SizedBox(height: 10),
-            ListTile(
-              title: const Text("Security Type"),
-              trailing: DropdownButton<String>(
-                value: _securityType,
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() => _securityType = newValue);
-                  }
-                },
-                items: ['WPA2', 'WPA', 'None'].map((type) {
-                  return DropdownMenuItem(
-                    value: type,
-                    child: Text(type),
-                  );
-                }).toList(),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+               color: Colors.lightBlueAccent.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.security, color: Colors.grey),
+                      SizedBox(width: 10),
+                      Text(
+                        "Security Type",
+                        style: TextStyle(fontSize: 16, color: Colors.black87),
+                      ),
+                    ],
+                  ),
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _securityType,
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() => _securityType = newValue);
+                        }
+                      },
+                      items: ['WPA2', 'WPA', 'None'].map((type) {
+                        return DropdownMenuItem(
+                          value: type,
+                          child: Text(type),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
+
             const SizedBox(height: 10),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(
-                labelText: "Wi-Fi Password",
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
               onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                labelText: "Wi-Fi Password",
+                labelStyle: const TextStyle(color: Colors.grey),
+                filled: true,
+                fillColor: Colors.lightBlueAccent.withOpacity(0.05),
+                contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Colors.black12, width: 2),
+                ),
+                prefixIcon: const Icon(Icons.wifi_password, color: Colors.grey),
+              ),
+              style: const TextStyle(fontSize: 16),
             ),
+
             const SizedBox(height: 20),
             if (qrData != null) ...[
-              const Text("Scan this QR code using Raspberry Pi:"),
-              const SizedBox(height: 10),
-              Center(
-                child: QrImageView(
-                  data: qrData,
-                  version: QrVersions.auto,
-                  size: 200.0,
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      "Scan this QR code using Raspberry Pi",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: QrImageView(
+                        data: qrData,
+                        version: QrVersions.auto,
+                        size: 200.0,
+                        backgroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ]
+
           ],
         ),
       ),

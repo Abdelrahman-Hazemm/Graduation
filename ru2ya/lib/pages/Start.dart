@@ -40,7 +40,7 @@ class Start extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
                 const Positioned(
-                  top: 205,
+                  top: 160,
                   child: Text(
                     "Let's Get",
                     textAlign: TextAlign.center,
@@ -51,7 +51,7 @@ class Start extends StatelessWidget {
                   ),
                 ),
                 const Positioned(
-                  top: 285,
+                  top: 230,
                   child: Text(
                     "Started!",
                     textAlign: TextAlign.center,

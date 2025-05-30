@@ -123,7 +123,7 @@ class _DevicesState extends State<Devices> {
                       color: Colors.grey[600],
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   _buildAddGlassesButton(context),
                 ],
               ),
@@ -240,10 +240,67 @@ class _DevicesState extends State<Devices> {
     return Center(
       child: InkWell(
         onTap: () {
-          // Show the SnackBar to indicate that the feature is coming soon
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("This feature is coming soon!")),
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Optional Lottie animation or Icon
+                      const Icon(Icons.construction, size: 60,  color: Color(0xFF0075f9),),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Coming Soon!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "We're working on this feature. It will be available in a future update!",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            backgroundColor:   const Color(0xFF0075f9),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            "Got it",
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           );
+
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 27.0, vertical: 5.0),
@@ -257,6 +314,7 @@ class _DevicesState extends State<Devices> {
               Image.asset(
                 'assets/glasses.png',
                 width: 60.0,
+                color: Colors.white70,
                 height: 60.0,
               ),
               const SizedBox(width: 20.0),
@@ -264,7 +322,7 @@ class _DevicesState extends State<Devices> {
                 'ADD NEW GLASSES ',
                 style: TextStyle(
                   color: Colors
-                      .white70, // Slightly lighter color to show it’s not available yet
+                      .white70,
                   fontWeight: FontWeight.bold,
                   fontSize: 18.0,
                 ),

@@ -33,18 +33,18 @@ class Welcome extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 50.0),
+          const SizedBox(height: 20.0),
           const Center(
             child:Text(
               'Welcome!',
               style: TextStyle(
-                fontSize: 60.0,
+                fontSize: 50.0,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF0075F9),
               ),
             ),
           ),
-          const SizedBox(height: 60.0),
+          const SizedBox(height: 40.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: InkWell(
@@ -56,7 +56,7 @@ class Welcome extends StatelessWidget {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 13.0),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0075f9),
                   borderRadius: BorderRadius.circular(20.0),
@@ -97,7 +97,7 @@ class Welcome extends StatelessWidget {
               },
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 16.0),
+                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 13.0),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0075f9),
                   borderRadius: BorderRadius.circular(20.0),
@@ -140,7 +140,7 @@ class Welcome extends StatelessWidget {
               },
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 16.0),
+                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 13.0),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0075f9),
                   borderRadius: BorderRadius.circular(20.0),
@@ -183,7 +183,7 @@ class Welcome extends StatelessWidget {
               },
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 16.0),
+                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 13.0),
                 decoration: BoxDecoration(
                   color: const Color(0xFF0075f9),
                   borderRadius: BorderRadius.circular(20.0),
