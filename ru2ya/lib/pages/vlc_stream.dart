@@ -28,9 +28,59 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     if (doc.exists &&
         doc.data() is Map &&
         (doc.data() as Map)['status'] == 'pending') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Request already pending. Please wait.')),
-      );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              backgroundColor: Colors.white,
+              elevation: 10,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.hourglass_top,
+                      color: Colors.orangeAccent,
+                      size: 60,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Please Wait',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Request already pending. Please wait for it to be processed.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      label: const Text('OK'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+
+
       return;
     }
 
@@ -61,9 +111,65 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
         await _fetchStreamUrlAndLaunch();
       } else if (status == 'rejected') {
         _cancelTimeout();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Request rejected by Pi.')),
-        );
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                backgroundColor: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.cancel,
+                        color: Colors.redAccent,
+                        size: 60,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Request Rejected',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'The Raspberry Pi has rejected your request.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            label: const Text('Close'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey.shade300,
+                              foregroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+
+
       } else if (status == 'timeout') {
         _cancelTimeout();
         ScaffoldMessenger.of(context).showSnackBar(

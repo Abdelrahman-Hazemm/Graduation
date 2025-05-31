@@ -101,9 +101,62 @@ class _BluetoothPageState extends State<BluetoothPage> {
         });
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Scan failed: $e')),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+            elevation: 16,
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.error_rounded,
+                    color: Colors.redAccent,
+                    size: 60,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Oops!',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Scan failed: $e',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      label: const Text('Got it'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueAccent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       );
+
     }
   }
 
