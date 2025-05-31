@@ -9,7 +9,7 @@ class Info extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         elevation: 0,
-      leading: IconButton(
+        leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(
             Icons.arrow_back,
@@ -25,23 +25,22 @@ class Info extends StatelessWidget {
             width: double.infinity,
             height: double.infinity,
           ),
-
           Positioned(
             top: 30,
             left: 0,
             right: 0,
             child: Container(
               width: double.infinity,
-              height: MediaQuery.of(context).size.height - 100, 
+              height: MediaQuery.of(context).size.height - 100,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30), 
+                  topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
                 ),
               ),
               child: const Padding(
-                padding: EdgeInsets.all(20), 
+                padding: EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -56,7 +55,6 @@ class Info extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 40),
-
                     Padding(
                       padding: EdgeInsets.only(left: 10),
                       child: Column(
@@ -71,15 +69,21 @@ class Info extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 20.0),
-                          Text('Jane',style: TextStyle(color: Colors.black54),),
+                          Text(
+                            'Jane',
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15
+                            ),
+                          ),
                           SizedBox(height: 10.0),
                         ],
                       ),
                     ),
                     Divider(thickness: 1, color: Colors.black),
-
                     Padding(
-                      padding: EdgeInsets.only(left: 10), 
+                      padding: EdgeInsets.only(left: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -93,15 +97,20 @@ class Info extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 20.0),
-                          Text('#001',style: TextStyle(color: Colors.black54),),
+                          Text(
+                            '#001',
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
+                            ),                          ),
                           SizedBox(height: 10.0),
                         ],
                       ),
                     ),
                     Divider(thickness: 1, color: Colors.black),
-
                     Padding(
-                      padding: EdgeInsets.only(left: 10), 
+                      padding: EdgeInsets.only(left: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -115,16 +124,20 @@ class Info extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 20.0),
-                          Text('01000000000',style: TextStyle(color: Colors.black54),),
+                          Text(
+                            '01000000000',
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
+                            ),                          ),
                           SizedBox(height: 10.0),
                         ],
                       ),
                     ),
                     Divider(thickness: 1, color: Colors.black),
-
-                    
                     Padding(
-                      padding: EdgeInsets.only(left: 10), 
+                      padding: EdgeInsets.only(left: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -138,15 +151,20 @@ class Info extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 20.0),
-                          Text('30 May 2003',style: TextStyle(color: Colors.black54),),
+                          Text(
+                            '30 May 2003',
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
+                            ),                          ),
                           SizedBox(height: 10.0),
                         ],
                       ),
                     ),
                     Divider(thickness: 1, color: Colors.black),
-
                     Padding(
-                      padding: EdgeInsets.only(left: 10), 
+                      padding: EdgeInsets.only(left: 10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -160,7 +178,13 @@ class Info extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 20.0),
-                          Text('Female',style: TextStyle(color: Colors.black54),),
+                          Text(
+                            'Female',
+                            style: TextStyle(
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
+                            ),                          ),
                           SizedBox(height: 10.0),
                         ],
                       ),
