@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ru2ya/components/Bluetooth_connection.dart';
 import 'package:ru2ya/pages/devices.dart';
 import 'package:ru2ya/pages/impaired.dart';
 import 'package:ru2ya/pages/qr_connection.dart';
@@ -170,50 +169,7 @@ class Welcome extends StatelessWidget {
               ),
             ),
           ), //Generate QR
-          const SizedBox(height: 30.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: InkWell(
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const BluetoothPage(),
-                  ),
-                );
-              },
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 13.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0075f9),
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      'assets/bluetooth.png',
-                      width: 50.0,
-                      color: Colors.white,
-                      height: 50.0,
-                    ),
-                    const SizedBox(width: 25.0),
-                    const Text(
-                      'BLUETOOTH',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
-                      ),
-                    ),
-                    const SizedBox(width: 25.0),
-
-                  ],
-                ),
-              ),
-            ),
-          ), //Bluetooth
-          const SizedBox(height: 30.0),
+          
         ],
       ),
     );

@@ -15,7 +15,6 @@ class WifiQrGeneratorPage extends StatefulWidget {
 class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
   final TextEditingController _ssidController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _bluetoothController = TextEditingController();
   String _securityType = 'WPA2';
 
   @override
@@ -33,24 +32,22 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
     final deviceInfo = DeviceInfoPlugin();
     final androidInfo = await deviceInfo.androidInfo;
     final model = androidInfo.model ?? "UnknownDevice";
-    final bluetoothName = "MyPiBridge_$model";
 
     setState(() {
       _ssidController.text = ssid?.replaceAll('"', '') ?? '';
-      _bluetoothController.text = bluetoothName;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final qrData = (_ssidController.text.isNotEmpty && _passwordController.text.isNotEmpty)
-        ? jsonEncode({
-            'ssid': _ssidController.text,
-            'password': _passwordController.text,
-            'security': _securityType,
-            'bluetoothName': _bluetoothController.text.isNotEmpty ? _bluetoothController.text : null,
-          })
-        : null;
+    final qrData =
+        (_ssidController.text.isNotEmpty && _passwordController.text.isNotEmpty)
+            ? jsonEncode({
+                'ssid': _ssidController.text,
+                'password': _passwordController.text,
+                'security': _securityType,
+              })
+            : null;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -69,7 +66,8 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
                 labelStyle: const TextStyle(color: Colors.grey),
                 filled: true,
                 fillColor: Colors.lightBlueAccent.withOpacity(0.05),
-                contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -86,40 +84,11 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
               ),
               style: const TextStyle(fontSize: 16),
             ),
-
-            const SizedBox(height: 10),
-            TextField(
-
-              controller: _bluetoothController,
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                labelText: "Bluetooth Name (optional)",
-                labelStyle: const TextStyle(color: Colors.grey),
-                filled: true,
-                fillColor: Colors.lightBlueAccent.withOpacity(0.05),
-                contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Colors.black12, width: 2),
-                ),
-                prefixIcon: const Icon(Icons.bluetooth, color: Colors.grey),
-              ),
-              style: const TextStyle(fontSize: 16),
-            ),
-
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-               color: Colors.lightBlueAccent.withOpacity(0.05),
+                color: Colors.lightBlueAccent.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.grey.shade300),
               ),
@@ -158,7 +127,6 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
                 ],
               ),
             ),
-
             const SizedBox(height: 10),
             TextField(
               controller: _passwordController,
@@ -168,7 +136,8 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
                 labelStyle: const TextStyle(color: Colors.grey),
                 filled: true,
                 fillColor: Colors.lightBlueAccent.withOpacity(0.05),
-                contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                   borderSide: BorderSide.none,
@@ -185,7 +154,6 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
               ),
               style: const TextStyle(fontSize: 16),
             ),
-
             const SizedBox(height: 20),
             if (qrData != null) ...[
               const SizedBox(height: 24),
@@ -234,7 +202,6 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
                 ),
               ),
             ]
-
           ],
         ),
       ),
