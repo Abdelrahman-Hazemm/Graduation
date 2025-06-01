@@ -162,7 +162,7 @@ class Welcome extends StatelessWidget {
                         fontSize: 20.0,
                       ),
                     ),
-                    const SizedBox(width: 25.0),
+                    
 
                   ],
                 ),
