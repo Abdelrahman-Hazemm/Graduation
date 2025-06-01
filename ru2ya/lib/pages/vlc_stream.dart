@@ -93,10 +93,55 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     _waitForResponse(requestRef);
   }
 
-  void _waitForResponse(DocumentReference requestRef) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Waiting for Raspberry Pi response...')),
-    );
+  Future<void> _waitForResponse(DocumentReference requestRef) async {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            backgroundColor: Colors.white,
+            elevation: 10,
+            child: const Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.hourglass_top,
+                    color: Colors.orangeAccent,
+                    size: 60,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Please Wait',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Waiting for Raspberry Pi response...',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                  SizedBox(height: 12),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+
+      // Auto dismiss after 1 second
+      await Future.delayed(const Duration(seconds: 1));
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+
+
 
     _subscription = requestRef.snapshots().listen((snapshot) async {
       final data = snapshot.data() as Map<String, dynamic>?;
@@ -173,12 +218,12 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
       } else if (status == 'timeout') {
         _cancelTimeout();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Request timed out.')),
+          const SnackBar(content: Text('Request timed out.')),
         );
       }
     });
 
-    _timeoutTimer = Timer(Duration(seconds: 30), () async {
+    _timeoutTimer = Timer(const Duration(seconds: 30), () async {
       try {
         final latest = await requestRef.get();
         final data = latest.data() as Map<String, dynamic>?;
@@ -186,7 +231,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
         if (data != null && data['status'] == 'pending') {
           await requestRef.update({'status': 'timeout'});
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Request timed out.')),
+            const SnackBar(content: Text('Request timed out.')),
           );
         }
       } catch (e) {
@@ -215,12 +260,12 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
           _launchVlc();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Empty stream URL received.')),
+            const SnackBar(content: Text('Empty stream URL received.')),
           );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to get stream URL.')),
+          const SnackBar(content: Text('Failed to get stream URL.')),
         );
       }
     } catch (e) {
@@ -234,7 +279,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
   Future<void> _launchVlc() async {
     if (_fullStreamUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No stream URL found.')),
+        const SnackBar(content: Text('No stream URL found.')),
       );
       return;
     }
@@ -267,9 +312,53 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
           _isStreaming = false;
           _fullStreamUrl = null;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Stream stopped successfully.')),
-        );
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                backgroundColor: Colors.white,
+                elevation: 10,
+                child: const Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline,
+                        color: Colors.green,
+                        size: 60,
+                      ),
+                      SizedBox(height: 16),
+                      Text(
+                        'Success',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'Stream stopped successfully.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                      SizedBox(height: 12),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+
+          await Future.delayed(const Duration(seconds: 1));
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+
+
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -294,7 +383,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Stream Request')),
+      appBar: AppBar(title: const Text('Stream Request')),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

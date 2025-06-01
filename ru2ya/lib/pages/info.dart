@@ -7,8 +7,9 @@ class Info extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        elevation: 0,
+        backgroundColor:   Color(0xFF0075f9),
+
+      elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: const Icon(
@@ -21,7 +22,7 @@ class Info extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            color: Colors.blue,
+            color: Color(0xFF0075f9),
             width: double.infinity,
             height: double.infinity,
           ),
@@ -52,7 +53,7 @@ class Info extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+                            color: Color(0xFF0075f9),
                           ),
                         ),
                       ),
@@ -67,7 +68,7 @@ class Info extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: Colors.blue,
+                                color: Color(0xFF0075f9),
                               ),
                             ),
                             SizedBox(height: 20.0),
@@ -95,7 +96,7 @@ class Info extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: Colors.blue,
+                                color: Color(0xFF0075f9),
                               ),
                             ),
                             SizedBox(height: 20.0),
@@ -123,7 +124,7 @@ class Info extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: Colors.blue,
+                                color: Color(0xFF0075f9),
                               ),
                             ),
                             SizedBox(height: 20.0),
@@ -151,7 +152,7 @@ class Info extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: Colors.blue,
+                                color: Color(0xFF0075f9),
                               ),
                             ),
                             SizedBox(height: 20.0),
@@ -179,7 +180,7 @@ class Info extends StatelessWidget {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 20,
-                                color: Colors.blue,
+                                color: Color(0xFF0075f9),
                               ),
                             ),
                             SizedBox(height: 20.0),

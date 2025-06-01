@@ -11,7 +11,7 @@ class Welcome extends StatelessWidget {
       backgroundColor: Colors.white,
       body: ListView(
         children: [
-          const SizedBox(height:40),
+          const SizedBox(height:60),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -42,7 +42,7 @@ class Welcome extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 40.0),
+          const SizedBox(height: 180.0),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: InkWell(

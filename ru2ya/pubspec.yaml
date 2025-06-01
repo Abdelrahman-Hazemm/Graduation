@@ -59,7 +59,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/glasses.png"
+  image_path: "assets/lolololo.jpg"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -85,6 +85,7 @@ flutter:
     - assets/qrr.png
     - assets/bluetooth.png
     - assets/logo.jpeg
+    - assets/lolololo.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
