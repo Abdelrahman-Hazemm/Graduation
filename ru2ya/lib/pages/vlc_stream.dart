@@ -28,58 +28,59 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     if (doc.exists &&
         doc.data() is Map &&
         (doc.data() as Map)['status'] == 'pending') {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              backgroundColor: Colors.white,
-              elevation: 10,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.hourglass_top,
-                      color: Colors.orangeAccent,
-                      size: 60,
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            backgroundColor: Colors.white,
+            elevation: 10,
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.hourglass_top,
+                    color: Colors.orangeAccent,
+                    size: 60,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Please Wait',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Please Wait',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Request already pending. Please wait for it to be processed.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.of(context).pop(),
+                    label: const Text('OK'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Request already pending. Please wait for it to be processed.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: Colors.black54),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () => Navigator.of(context).pop(),
-                      label: const Text('OK'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            );
-          },
-        );
-
+            ),
+          );
+        },
+      );
 
       return;
     }
@@ -104,74 +105,82 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
       if (data == null) return;
 
       final status = data['status'];
-
       if (status == 'accepted') {
         print("Request accepted by Pi.");
         _cancelTimeout();
         await _fetchStreamUrlAndLaunch();
+        // Cancel subscription after successfully starting the stream
+        _subscription?.cancel();
+        _subscription = null;
       } else if (status == 'rejected') {
         _cancelTimeout();
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                backgroundColor: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.cancel,
-                        color: Colors.redAccent,
-                        size: 60,
+        // Cancel subscription since request is finished
+        _subscription?.cancel();
+        _subscription = null;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              backgroundColor: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.cancel,
+                      color: Colors.redAccent,
+                      size: 60,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Request Rejected',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Request Rejected',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'The Raspberry Pi has rejected your request.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.black54),
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            label: const Text('Close'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey.shade300,
-                              foregroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'The Raspberry Pi has rejected your request.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          label: const Text('Close'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey.shade300,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              );
-            },
-          );
-
-
+              ),
+            );
+          },
+        );
       } else if (status == 'timeout') {
         _cancelTimeout();
+        // Cancel subscription since request is finished
+        _subscription?.cancel();
+        _subscription = null;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Request timed out.')),
         );
@@ -199,7 +208,9 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
 
   void _cancelTimeout() {
     _timeoutTimer?.cancel();
+    _timeoutTimer = null;
     _subscription?.cancel();
+    _subscription = null;
   }
 
   Future<void> _fetchStreamUrlAndLaunch() async {
@@ -259,10 +270,22 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
     const stopUrl =
         'https://ruya-production.up.railway.app/api/stream/stop-stream';
 
+    // Cancel any active subscriptions and timers first
+    _cancelTimeout();
+
     try {
       final response = await http.post(Uri.parse(stopUrl));
 
       if (response.statusCode == 200) {
+        // Also clean up the Firestore document to avoid any lingering status
+        try {
+          final requestRef =
+              FirebaseFirestore.instance.collection('requests').doc(requestId);
+          await requestRef.update({'status': 'stopped'});
+        } catch (e) {
+          debugPrint('Error updating Firestore document: $e');
+        }
+
         setState(() {
           _isStreaming = false;
           _fullStreamUrl = null;
@@ -273,8 +296,8 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text('Failed to stop stream. Status: ${response.statusCode}')),
+              content: Text(
+                  'Failed to stop stream. Status: ${response.statusCode}')),
         );
       }
     } catch (e) {
@@ -303,8 +326,8 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
               onTap: _sendRequest,
               borderRadius: BorderRadius.circular(12.0),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 16.0),
                 decoration: BoxDecoration(
                   color: Colors.blue,
                   borderRadius: BorderRadius.circular(12.0),
@@ -324,8 +347,8 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
               onTap: _stopStream,
               borderRadius: BorderRadius.circular(12.0),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 16.0),
                 decoration: BoxDecoration(
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(12.0),
