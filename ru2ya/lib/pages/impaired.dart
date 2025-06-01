@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:ru2ya/pages/qr_connection.dart';
 
 class ImpairedPage extends StatefulWidget {
   const ImpairedPage({Key? key}) : super(key: key);
@@ -141,11 +142,51 @@ class _ImpairedPageState extends State<ImpairedPage> {
               _statusMessage,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 40),
+            ),            const SizedBox(height: 40),
             Text(
               "User: ${blindUserId.replaceAll('_', ' ').toUpperCase()}",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 30),
+            // Generate QR Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const WifiQrGeneratorPage(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 13.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0075f9),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/qrr.png',
+                        width: 50.0,
+                        color: Colors.white,
+                        height: 50.0,
+                      ),
+                      const SizedBox(width: 25.0),
+                      const Text(
+                        'GENERATE QR',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),

@@ -500,23 +500,7 @@ class _DetailsState extends State<Details> {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Icon(
-                      isApiConnected ? Icons.cloud_done : Icons.cloud_off,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      isApiConnected ? "API Online" : "API Offline",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+              
               ],
             ),
           ],
