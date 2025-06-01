@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:http/http.dart' as http;
+import 'package:ru2ya/pages/qr_connection.dart';
 
 class ImpairedPage extends StatefulWidget {
   const ImpairedPage({Key? key}) : super(key: key);
@@ -16,15 +15,12 @@ class ImpairedPage extends StatefulWidget {
 class _ImpairedPageState extends State<ImpairedPage> {
   final String blindUserId = "blind_user_1";
   Timer? _locationTimer;
-  Timer? _apiTimer;
   bool _isTracking = false;
   String _statusMessage = "Initializing location tracking...";
-
   @override
   void initState() {
     super.initState();
     _initLocationTracking();
-    _startApiMonitoring(); // Starts the API listener when page opens
   }
 
   Future<void> _initLocationTracking() async {
@@ -120,44 +116,11 @@ class _ImpairedPageState extends State<ImpairedPage> {
       setState(() {
         _statusMessage = "Error sending location: $e";
       });
-    }
-  }
-
-  void _startApiMonitoring() {
-  _apiTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
-    try {
-      final response = await http.get(Uri.parse(
-          'https://ruya-production.up.railway.app/api/status'));
-      if (response.statusCode == 200) {
-        final rawData = jsonDecode(response.body);
-
-        // Rename "model" to "mode" if present
-        final Map<String, dynamic> data = Map<String, dynamic>.from(rawData);
-        if (data.containsKey('model')) {
-          data['mode'] = data['model'];
-          data.remove('model');
-        }
-
-        await FirebaseFirestore.instance
-            .collection('devices')
-            .doc('deviceData1')
-            .set(data);
-
-        print("API data (with 'mode') updated to Firebase: $data");
-      } else {
-        print("Failed to fetch API: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Error fetching API: $e");
-    }
-  });
-}
-
+    }  }
 
   @override
   void dispose() {
     _locationTimer?.cancel();
-    _apiTimer?.cancel();
     super.dispose();
   }
 
@@ -179,11 +142,51 @@ class _ImpairedPageState extends State<ImpairedPage> {
               _statusMessage,
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 40),
+            ),            const SizedBox(height: 40),
             Text(
               "User: ${blindUserId.replaceAll('_', ' ').toUpperCase()}",
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 30),
+            // Generate QR Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const WifiQrGeneratorPage(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 13.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0075f9),
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/qrr.png',
+                        width: 50.0,
+                        color: Colors.white,
+                        height: 50.0,
+                      ),
+                      const SizedBox(width: 25.0),
+                      const Text(
+                        'GENERATE QR',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20.0,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
