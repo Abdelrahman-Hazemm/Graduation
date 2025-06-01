@@ -7,8 +7,10 @@ import 'package:ru2ya/pages/Start.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:ru2ya/pages/vlc_stream.dart'; // Import VlcStreamPage
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -37,13 +39,22 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  // Initialize flutter_local_notifications
+  // Initialize flutter_local_notifications with onDidReceiveNotificationResponse
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
   const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) async {
+      if (response.payload == 'open_vlc_stream') {
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(builder: (_) => VlcStreamPage()),
+        );
+      }
+    },
+  );
 
   // Disable SSL verification (temporary fix for debugging)
   HttpOverrides.global = MyHttpOverrides();
@@ -86,7 +97,7 @@ void main() async {
   // Handle foreground messages
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
+    print('Message data: \\${message.data}');
     if (message.notification != null) {
       final notification = message.notification!;
       final android = message.notification?.android;
@@ -104,6 +115,7 @@ void main() async {
             icon: android?.smallIcon ?? '@mipmap/ic_launcher',
           ),
         ),
+        payload: 'open_vlc_stream', // Pass payload to open VLC stream page
       );
     }
   });
@@ -125,6 +137,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        navigatorKey: navigatorKey, // Add this line
         debugShowCheckedModeBanner: false,
         theme: ThemeData(fontFamily: 'Inter'),
         home: Start());
