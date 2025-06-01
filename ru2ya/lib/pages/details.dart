@@ -90,10 +90,12 @@ class _DetailsState extends State<Details> {
 
   void _startApiMonitoring() {
     _apiTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      bool gotResponse = false;
       try {
         final response = await http.get(Uri.parse(
             'https://ruya-production.up.railway.app/api/status'));
         if (response.statusCode == 200) {
+          gotResponse = true;
           final rawData = jsonDecode(response.body);
 
           // Rename "model" to "mode" if present
@@ -117,20 +119,16 @@ class _DetailsState extends State<Details> {
 
           print("API data (with 'mode') updated to Firebase: $data");
         } else {
-          if (mounted) {
-            setState(() {
-              isApiConnected = false;
-            });
-          }
-          print("Failed to fetch API: ${response.statusCode}");
+          print("Failed to fetch API: \\${response.statusCode}");
         }
       } catch (e) {
-        if (mounted) {
-          setState(() {
-            isApiConnected = false;
-          });
-        }
         print("Error fetching API: $e");
+      }
+      // If no response or error, set isApiConnected to false
+      if (!gotResponse && mounted) {
+        setState(() {
+          isApiConnected = false;
+        });
       }
     });
   }
@@ -434,6 +432,15 @@ class _DetailsState extends State<Details> {
   Widget _buildStatusCard() {
     // Determine overall connection status based on both device and API
     bool overallConnected = isDeviceConnected && isApiConnected;
+
+    // Check if lastApiResponse is older than 1 minute
+    if (lastApiResponse != null) {
+      final now = DateTime.now();
+      final difference = now.difference(lastApiResponse!);
+      if (difference.inMinutes >= 1) {
+        overallConnected = false;
+      }
+    }
     
     return Container(
       padding: const EdgeInsets.all(10),
