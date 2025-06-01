@@ -499,7 +499,7 @@ class _DetailsState extends State<Details> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      isDeviceConnected ? "Device Online" : "Device Offline",
+                      isDeviceConnected ? "Online" : " Offline",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
