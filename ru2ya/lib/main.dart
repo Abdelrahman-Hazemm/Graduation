@@ -39,16 +39,17 @@ void main() async {
   String? firebaseToken = await FirebaseMessaging.instance.getToken();
   print('Firebase token: $firebaseToken');
 
-  // Save the custom token and Firebase token to Firestore
+  // Save the Firebase token to the user's document in Firestore
+  const userId = 'user_123'; // Replace with the actual user ID
   if (firebaseToken != null) {
     try {
-      await FirebaseFirestore.instance.collection('device_tokens').doc(customToken).set({
-        'firebaseToken': firebaseToken,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-      print('Custom token and Firebase token saved to Firestore');
+      await FirebaseFirestore.instance.collection('app_users').doc(userId).set({
+        'deviceToken': firebaseToken,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+      print('Firebase token saved to user document in Firestore');
     } catch (e) {
-      print('Error saving token to Firestore: $e');
+      print('Error saving token to user document: $e');
     }
   }
 

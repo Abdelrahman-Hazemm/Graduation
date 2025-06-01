@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:ru2ya/pages/devices.dart';
 import 'package:ru2ya/pages/info.dart';
 import 'package:ru2ya/pages/vlc_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
 
 class Details extends StatefulWidget {
   final Map<String, dynamic> blindUserData;
@@ -28,12 +29,14 @@ class _DetailsState extends State<Details> {
   bool _isLoadingLocation = false;
   StreamSubscription<DocumentSnapshot>? _locationSubscription;
   StreamSubscription<DocumentSnapshot>? _deviceSubscription;
+  Timer? _apiTimer;
   late String blindUserId;
   late String deviceId;
   String currentMode = "Loading...";
   String batteryLevel = "Loading...";
   bool isDeviceConnected = false; // Will store wifiConnected status
-
+  bool isApiConnected = true; // Track API connection status
+  DateTime? lastApiResponse;
   @override
   void initState() {
     super.initState();
@@ -46,6 +49,7 @@ class _DetailsState extends State<Details> {
     _initializePosition();
     _listenToBlindUserLocation();
     _listenToDeviceUpdates();
+    _startApiMonitoring(); // Start API monitoring
   }
 
   void _initializePosition() {
@@ -82,6 +86,52 @@ class _DetailsState extends State<Details> {
           isDeviceConnected = false; // Default to disconnected on error
         });
       }
+    });  }
+
+  void _startApiMonitoring() {
+    _apiTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      try {
+        final response = await http.get(Uri.parse(
+            'https://ruya-production.up.railway.app/api/status'));
+        if (response.statusCode == 200) {
+          final rawData = jsonDecode(response.body);
+
+          // Rename "model" to "mode" if present
+          final Map<String, dynamic> data = Map<String, dynamic>.from(rawData);
+          if (data.containsKey('model')) {
+            data['mode'] = data['model'];
+            data.remove('model');
+          }
+
+          await FirebaseFirestore.instance
+              .collection('devices')
+              .doc('deviceData1')
+              .set(data);
+
+          if (mounted) {
+            setState(() {
+              isApiConnected = true;
+              lastApiResponse = DateTime.now();
+            });
+          }
+
+          print("API data (with 'mode') updated to Firebase: $data");
+        } else {
+          if (mounted) {
+            setState(() {
+              isApiConnected = false;
+            });
+          }
+          print("Failed to fetch API: ${response.statusCode}");
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            isApiConnected = false;
+          });
+        }
+        print("Error fetching API: $e");
+      }
     });
   }
 
@@ -89,6 +139,7 @@ class _DetailsState extends State<Details> {
   void dispose() {
     _locationSubscription?.cancel();
     _deviceSubscription?.cancel();
+    _apiTimer?.cancel();
     super.dispose();
   }
 
@@ -380,46 +431,93 @@ class _DetailsState extends State<Details> {
       ),
     );
   }
-
   Widget _buildStatusCard() {
+    // Determine overall connection status based on both device and API
+    bool overallConnected = isDeviceConnected && isApiConnected;
+    
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: isDeviceConnected ? const Color(0xFF4ACD12) : Colors.red,
+        color: overallConnected ? const Color(0xFF4ACD12) : Colors.red,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  isDeviceConnected ? "CONNECTED" : "DISCONNECTED",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      overallConnected ? "CONNECTED" : "DISCONNECTED",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      "Battery: $batteryLevel",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
                 Text(
-                  "Battery: $batteryLevel",
+                  batteryLevel,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                  ),
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
                 ),
               ],
             ),
-            Text(
-              batteryLevel,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold),
+            const SizedBox(height: 10),
+            // Status indicators
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      isDeviceConnected ? Icons.wifi : Icons.wifi_off,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      isDeviceConnected ? "Device Online" : "Device Offline",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      isApiConnected ? Icons.cloud_done : Icons.cloud_off,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      isApiConnected ? "API Online" : "API Offline",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
