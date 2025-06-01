@@ -6,14 +6,44 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ru2ya/pages/Start.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('Handling a background message: ${message.messageId}');
+  await Firebase.initializeApp();
+  if (message.notification != null) {
+    final notification = message.notification!;
+    final android = message.notification?.android;
+    flutterLocalNotificationsPlugin.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'fcm_default_channel',
+          'FCM Notifications',
+          channelDescription: 'Channel for FCM notifications',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: android?.smallIcon ?? '@mipmap/ic_launcher',
+        ),
+      ),
+    );
+  }
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  // Initialize flutter_local_notifications
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   // Disable SSL verification (temporary fix for debugging)
   HttpOverrides.global = MyHttpOverrides();
@@ -52,6 +82,31 @@ void main() async {
       print('Error saving token to user document: $e');
     }
   }
+
+  // Handle foreground messages
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+    if (message.notification != null) {
+      final notification = message.notification!;
+      final android = message.notification?.android;
+      flutterLocalNotificationsPlugin.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'fcm_default_channel',
+            'FCM Notifications',
+            channelDescription: 'Channel for FCM notifications',
+            importance: Importance.max,
+            priority: Priority.high,
+            icon: android?.smallIcon ?? '@mipmap/ic_launcher',
+          ),
+        ),
+      );
+    }
+  });
 
   runApp(ProviderScope(child: MyApp()));
 }

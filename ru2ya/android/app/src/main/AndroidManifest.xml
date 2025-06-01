@@ -28,7 +28,7 @@
         <service android:name="com.transistorsoft.locationmanager.BackgroundGeolocationService" android:foregroundServiceType="location" android:enabled="true" android:exported="false"/>
 
         <service
-            android:name=".java.MyFirebaseMessagingService"
+            android:name=".MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
