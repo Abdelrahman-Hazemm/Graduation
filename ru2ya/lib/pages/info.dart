@@ -54,8 +54,8 @@ class _InfoState extends State<Info> {
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : userData == null
-              ? Center(child: Text('No data found'))
-              : buildUserInfo(context),
+          ? Center(child: Text('No data found'))
+          : buildUserInfo(context),
     );
   }
 
