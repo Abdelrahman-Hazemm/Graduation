@@ -11,27 +11,26 @@ class Welcome extends StatelessWidget {
       backgroundColor: Colors.white,
       body: ListView(
         children: [
-          const SizedBox(height:60),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/glasses.png',
-                width: 60,
-                height: 60,
-                color: Colors.black,
-              ),
-              const Text(
-                "RU'YA",
-                style: TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height:150),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: [
+          //     Image.asset(
+          //       'assets/glasses.png',
+          //       width: 60,
+          //       height: 60,
+          //       color: Colors.black,
+          //     ),
+          //     const Text(
+          //       "RU'YA",
+          //       style: TextStyle(
+          //         fontSize: 35,
+          //         fontWeight: FontWeight.bold,
+          //         color: Colors.black,
+          //       ),
+          //     ),
+          //   ],
+          // ),
           const Center(
             child:Text(
               'Welcome!',
