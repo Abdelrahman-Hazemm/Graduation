@@ -38,8 +38,7 @@ class _DetailsState extends State<Details> {
   bool isDeviceConnected = false; // Will store wifiConnected status
   bool isApiConnected = true; // Track API connection status
   DateTime? lastApiResponse;
-  bool _sosActive = false;
-  Timer? _sosMonitorTimer;
+  
 
   @override
   void initState() {
@@ -54,7 +53,7 @@ class _DetailsState extends State<Details> {
     _listenToBlindUserLocation();
     _listenToDeviceUpdates();
     _startApiMonitoring(); // Start API monitoring
-    _startSosMonitor();
+    
   }
 
   void _initializePosition() {
@@ -139,42 +138,12 @@ class _DetailsState extends State<Details> {
     });
   }
 
-  void _startSosMonitor() {
-    // Replace 'YOUR_API_URL' with the actual API endpoint when available
-    const apiUrl = 'YOUR_API_URL';
-    _sosMonitorTimer?.cancel();
-    _sosMonitorTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-      try {
-        final response = await http.get(Uri.parse(apiUrl));
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          // Assume the API returns { "sos": true } when SOS is active
-          if (data is Map && data['sos'] == true) {
-            if (!_sosActive && mounted) {
-              setState(() {
-                _sosActive = true;
-              });
-            }
-          } else {
-            if (_sosActive && mounted) {
-              setState(() {
-                _sosActive = false;
-              });
-            }
-          }
-        }
-      } catch (e) {
-        // Optionally handle errors
-      }
-    });
-  }
 
   @override
   void dispose() {
     _locationSubscription?.cancel();
     _deviceSubscription?.cancel();
     _apiTimer?.cancel();
-    _sosMonitorTimer?.cancel();
     super.dispose();
   }
 
