@@ -54,25 +54,7 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
       ),
-<<<<<<< HEAD
-      body: Padding(
-        padding: const EdgeInsets.all(6.0),
-        child: ListView(
-          children: [
-            TextField(
-              controller: _ssidController,
-              onChanged: (_) => setState(() {}),
-              decoration: InputDecoration(
-                labelText: "Wi-Fi SSID",
-                labelStyle: const TextStyle(color: Colors.grey),
-                filled: true,
-                fillColor: Colors.lightBlueAccent.withOpacity(0.05),
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-=======
+
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -104,7 +86,7 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
                   ),
                   prefixIcon:
                   const Icon(Icons.wifi_outlined, color: Colors.grey),
->>>>>>> 6cd1d0bb08470659884a245ba4d28e0a6418c79e
+
                 ),
                 style: const TextStyle(fontSize: 16),
               ),
@@ -214,11 +196,9 @@ class _WifiQrGeneratorPageState extends State<WifiQrGeneratorPage> {
                       QrImageView(
                         data: qrData,
                         version: QrVersions.auto,
-<<<<<<< HEAD
-                        size: 400.0,
-=======
+
                         size: 380.0,
->>>>>>> 6cd1d0bb08470659884a245ba4d28e0a6418c79e
+
                         backgroundColor: Colors.white,
                       ),
                       const SizedBox(height: 20),
