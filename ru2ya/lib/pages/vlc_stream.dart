@@ -135,8 +135,7 @@ class _VlcStreamPageState extends State<VlcStreamPage> {
         },
       );
 
-      // Auto dismiss after 1 second
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 2));
       if (context.mounted) {
         Navigator.of(context).pop();
       }

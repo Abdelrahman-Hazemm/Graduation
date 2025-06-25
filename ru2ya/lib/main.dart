@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ru2ya/pages/Start.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ru2ya/pages/welcome.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ru2ya/pages/vlc_stream.dart'; // Import VlcStreamPage
@@ -140,6 +141,6 @@ class MyApp extends StatelessWidget {
         navigatorKey: navigatorKey, // Add this line
         debugShowCheckedModeBanner: false,
         theme: ThemeData(fontFamily: 'Inter'),
-        home: Start());
+        home: Welcome());
   }
 }

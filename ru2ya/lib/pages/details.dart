@@ -7,6 +7,7 @@ import 'package:ru2ya/pages/info.dart';
 import 'package:ru2ya/pages/vlc_stream.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class Details extends StatefulWidget {
   final Map<String, dynamic> blindUserData;
@@ -37,6 +38,9 @@ class _DetailsState extends State<Details> {
   bool isDeviceConnected = false; // Will store wifiConnected status
   bool isApiConnected = true; // Track API connection status
   DateTime? lastApiResponse;
+  bool _sosActive = false;
+  Timer? _sosMonitorTimer;
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +54,7 @@ class _DetailsState extends State<Details> {
     _listenToBlindUserLocation();
     _listenToDeviceUpdates();
     _startApiMonitoring(); // Start API monitoring
+    _startSosMonitor();
   }
 
   void _initializePosition() {
@@ -86,14 +91,15 @@ class _DetailsState extends State<Details> {
           isDeviceConnected = false; // Default to disconnected on error
         });
       }
-    });  }
+    });
+  }
 
   void _startApiMonitoring() {
     _apiTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
       bool gotResponse = false;
       try {
-        final response = await http.get(Uri.parse(
-            'https://ruya-production.up.railway.app/api/status'));
+        final response = await http.get(
+            Uri.parse('https://ruya-production.up.railway.app/api/status'));
         if (response.statusCode == 200) {
           gotResponse = true;
           final rawData = jsonDecode(response.body);
@@ -133,11 +139,42 @@ class _DetailsState extends State<Details> {
     });
   }
 
+  void _startSosMonitor() {
+    // Replace 'YOUR_API_URL' with the actual API endpoint when available
+    const apiUrl = 'YOUR_API_URL';
+    _sosMonitorTimer?.cancel();
+    _sosMonitorTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      try {
+        final response = await http.get(Uri.parse(apiUrl));
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          // Assume the API returns { "sos": true } when SOS is active
+          if (data is Map && data['sos'] == true) {
+            if (!_sosActive && mounted) {
+              setState(() {
+                _sosActive = true;
+              });
+            }
+          } else {
+            if (_sosActive && mounted) {
+              setState(() {
+                _sosActive = false;
+              });
+            }
+          }
+        }
+      } catch (e) {
+        // Optionally handle errors
+      }
+    });
+  }
+
   @override
   void dispose() {
     _locationSubscription?.cancel();
     _deviceSubscription?.cancel();
     _apiTimer?.cancel();
+    _sosMonitorTimer?.cancel();
     super.dispose();
   }
 
@@ -315,7 +352,7 @@ class _DetailsState extends State<Details> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.info, color: Colors.blue, size: 30),
+            icon:  Icon(Icons.info, color:Colors.blue.withOpacity(0.7), size: 30),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => Info()),
@@ -329,13 +366,16 @@ class _DetailsState extends State<Details> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                SizedBox(
-                  height: 300,
-                  child: ClipRRect(
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(20.0),
-                    child: Stack(
-                      children: [
-                        GoogleMap(
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 300,
+                        child: GoogleMap(
                           initialCameraPosition: CameraPosition(
                             target: _currentPosition,
                             zoom: 15,
@@ -346,72 +386,49 @@ class _DetailsState extends State<Details> {
                           },
                           myLocationEnabled: true,
                           markers: _markers,
-                          zoomControlsEnabled: false,
                         ),
-                        Positioned(
-                          top: 10,
-                          right: 10,
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Colors.white,
-                                child: IconButton(
-                                  icon: const Icon(Icons.refresh,
-                                      color: Colors.green),
-                                  onPressed: _fetchLatestLocation,
-                                ),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(20.0),
+                                bottomRight: Radius.circular(20.0),
                               ),
-                              const SizedBox(height: 10),
-                              CircleAvatar(
-                                backgroundColor: Colors.white,
-                                child: IconButton(
-                                  icon: const Icon(Icons.my_location,
-                                      color: Colors.blue),
-                                  onPressed: _getUserLocation,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 10,
-                          left: 10,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.person_pin_circle,
-                                    color: Colors.red),
-                                const SizedBox(width: 8),
-                                Text(
-                                  "Tracking $userName",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
                             ),
                           ),
+                          icon: const Icon(Icons.map, color: Colors.blue),
+                          label: const Text('Open in Google Maps'),
+                          onPressed: () async {
+                            final lat = _currentPosition.latitude;
+                            final lng = _currentPosition.longitude;
+                            final googleMapsUrl =
+                                'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+                            if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
+                              await launchUrl(
+                                Uri.parse(googleMapsUrl),
+                                mode: LaunchMode.externalApplication,
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Could not open Google Maps.')),
+                              );
+                            }
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 25),
                 _buildStatusCard(),
                 const SizedBox(height: 25),
                 _buildModeTile(),
-                const SizedBox(height: 25),
-                _buildActionTile(
-                    "My Glasses", "assets/glasses.png", const Color(0xFF0075f9),
-                    () {
-                  // Add navigation to glasses management page when implemented
-                }),
+                
                 const SizedBox(height: 25),
                 _buildActionTile(
                     "Live Feed", "assets/visible.png", const Color(0xFF0075f9),
@@ -429,6 +446,7 @@ class _DetailsState extends State<Details> {
       ),
     );
   }
+
   Widget _buildStatusCard() {
     // Determine overall connection status based on both device and API
     bool overallConnected = isDeviceConnected && isApiConnected;
@@ -441,101 +459,119 @@ class _DetailsState extends State<Details> {
         overallConnected = false;
       }
     }
-    
+
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: overallConnected ? const Color(0xFF4ACD12) : Colors.red,
+        color: Colors.lightBlueAccent.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      overallConnected ? "CONNECTED" : "DISCONNECTED",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
+      child: Row(
+        children: [
+          Icon(
+            overallConnected ? Icons.check_circle : Icons.warning_rounded,
+            color: overallConnected ? Colors.green : Colors.yellow[800],
+            size: 55,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            overallConnected ? "CONNECTED" : "DISCONNECTED",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "Battery: $batteryLevel",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      "Battery: $batteryLevel",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
+                      Text(
+                        batteryLevel,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Text(
-                  batteryLevel,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            isDeviceConnected ? Icons.wifi : Icons.wifi_off,
+                            color: Colors.black,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            isDeviceConnected
+                                ? "Device Online"
+                                : "Device Offline",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-            // Status indicators
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      isDeviceConnected ? Icons.wifi : Icons.wifi_off,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      isDeviceConnected ? "Device Online" : "Device Offline",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildModeTile() {
     return InkWell(
-      onTap: () {
-        // Could open a modal to change the mode in the future
-      },
+      onTap: () {},
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF4ACD12),
+          color: Colors.lightBlueAccent.withOpacity(0.2),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/object.png',
-              width: 55,
-              height: 55,
-              fit: BoxFit.contain,
-            ),
+            currentMode == "none"
+                ? Icon(
+                    Icons.warning_rounded,
+                    color: Colors.yellow[800],
+                    size: 55,
+                  )
+                : Image.asset(
+                    'assets/object.png',
+                    width: 55,
+                    height: 55,
+                    fit: BoxFit.contain,
+                    color: Colors.black,
+                  ),
             const SizedBox(width: 40.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -543,7 +579,7 @@ class _DetailsState extends State<Details> {
                 const Text(
                   "CURRENT MODE",
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
@@ -552,9 +588,8 @@ class _DetailsState extends State<Details> {
                 Text(
                   currentMode,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -566,7 +601,7 @@ class _DetailsState extends State<Details> {
   }
 
   Widget _buildActionTile(
-      String title, String asset, Color color, Function() onTap) {
+      String title, String asset, Color color, Function() onTap, {bool noIcon = false}) {
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -578,13 +613,14 @@ class _DetailsState extends State<Details> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              asset,
-              width: 55,
-              height: 55,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(width: 40.0),
+            if (!noIcon)
+              Image.asset(
+                asset,
+                width: 55,
+                height: 55,
+                fit: BoxFit.contain,
+              ),
+            if (!noIcon) const SizedBox(width: 40.0),
             Text(
               title,
               style: const TextStyle(
