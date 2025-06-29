@@ -95,6 +95,14 @@ void main() async {
     }
   }
 
+  // Retrieve and print the device token
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  messaging.getToken().then((token) {
+    if (token != null) {
+      print('Device Token: $token');
+    }
+  });
+
   // Handle foreground messages
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');

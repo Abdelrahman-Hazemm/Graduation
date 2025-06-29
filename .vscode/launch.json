@@ -1,0 +1,28 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ru2ya",
+            "cwd": "ru2ya",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "ru2ya (profile mode)",
+            "cwd": "ru2ya",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "ru2ya (release mode)",
+            "cwd": "ru2ya",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
