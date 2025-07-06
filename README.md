@@ -29,7 +29,7 @@ A Flutter application designed to assist visually impaired users and their careg
 ### Installation
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/Abdelrahman-Hazemm/Graduation.git
    cd ru2ya
    ```
 2. **Install dependencies:**
