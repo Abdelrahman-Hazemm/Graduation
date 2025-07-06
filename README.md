@@ -19,6 +19,12 @@ A Flutter application designed to assist visually impaired users and their careg
 - **Firebase Integration:**
   - Uses Firebase Authentication, Firestore, and Messaging for secure, real-time data.
 
+## Screenshots
+
+| Welcome Screen | Caregiver Dashboard | Glasses Device | QR Code Generator |
+|:--------------:|:------------------:|:--------------:|:-----------------:|
+| ![Welcome](assets/screenshots/welcome_screen.jpg) | ![Dashboard](assets/screenshots/dashboard_screen.jpg) | ![Glasses](assets/screenshots/glasses_screen.jpg) | ![QR Screen](assets/screenshots/qr_screen.jpg) |
+
 ## Getting Started
 
 ### Prerequisites
@@ -29,7 +35,7 @@ A Flutter application designed to assist visually impaired users and their careg
 ### Installation
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Abdelrahman-Hazemm/Graduation.git
+   git clone <your-repo-url>
    cd ru2ya
    ```
 2. **Install dependencies:**
