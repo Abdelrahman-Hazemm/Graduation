@@ -23,7 +23,7 @@ A Flutter application designed to assist visually impaired users and their careg
 
 | Welcome Screen | Caregiver Dashboard | Glasses Device | QR Code Generator |
 |:--------------:|:------------------:|:--------------:|:-----------------:|
-| ![Welcome](assets/screenshots/welcome_screen.jpg) | ![Dashboard](assets/screenshots/dashboard_screen.jpg) | ![Glasses](assets/screenshots/glasses_screen.jpg) | ![QR Screen](assets/screenshots/qr_screen.jpg) |
+| ![Welcome](ru2ya/assets/screenshots/welcome_screen.jpg) | ![Dashboard](ru2ya/assets/screenshots/dashboard_screen.jpg) | ![Glasses](ru2ya/assets/screenshots/glasses_screen.jpg) | ![QR Screen](ru2ya/assets/screenshots/qr_screen.jpg) |
 
 ## Getting Started
 
